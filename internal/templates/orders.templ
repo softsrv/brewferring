@@ -1,0 +1,60 @@
+package templates
+
+import "fmt"
+
+type Order struct {
+	ID        string
+	Status    string
+	Total     float64
+	Items     []OrderItem
+	CreatedAt string
+}
+
+type OrderItem struct {
+	ProductName string
+	Quantity    int
+	Price       float64
+}
+
+templ Orders(orders []Order) {
+	<!DOCTYPE html>
+	<html lang="en" data-theme="synthwave">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>Orders - Brewferring</title>
+			<link rel="stylesheet" href="/static/css/output.css" />
+			<script src="/static/script/htmx.min.js"></script>
+		</head>
+		<body class="min-h-screen bg-base-200">
+			@Navbar(NavbarProps{IsAuthenticated: true})
+			<main class="container mx-auto px-4 py-8">
+				<h1 class="text-4xl font-bold mb-8">Your Orders</h1>
+				<div class="overflow-x-auto">
+					<table class="table w-full">
+						<thead>
+							<tr>
+								<th>Order ID</th>
+								<th>Status</th>
+								<th>Total</th>
+								<th>Created At</th>
+							</tr>
+						</thead>
+						<tbody>
+							for _, order := range orders {
+								<tr>
+									<td>{ order.ID }</td>
+									<td>
+										<div class="badge badge-primary">{ order.Status }</div>
+									</td>
+									<td>${ fmt.Sprintf("%.2f", order.Total) }</td>
+									<td>{ order.CreatedAt }</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
+			</main>
+		</body>
+	</html>
+}
