@@ -1,0 +1,153 @@
+package templates
+
+import (
+	"context"
+	"io"
+
+	"github.com/softsrv/brewferring/internal/models"
+)
+
+type DevicesProps struct {
+	Devices []models.Device
+}
+
+func Devices(devices []models.Device) templ.Component {
+	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) (err error) {
+		props := DevicesProps{
+			Devices: devices,
+		}
+		return DevicesTemplate(props).Render(ctx, w)
+	})
+}
+
+templ DevicesTemplate(props DevicesProps) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>Devices - Brewferring</title>
+			<link href="https://cdn.jsdelivr.net/npm/daisyui@2.6.0/dist/full.css" rel="stylesheet" type="text/css"/>
+			<script src="https://cdn.tailwindcss.com"></script>
+		</head>
+		<body class="bg-base-200">
+			@Navbar(NavbarProps{IsAuthenticated: true})
+			<div class="container mx-auto px-4 py-8">
+				<div class="flex justify-between items-center mb-8">
+					<h1 class="text-3xl font-bold">Devices</h1>
+					<button class="btn btn-primary" onclick="document.getElementById('create-device-modal').showModal()">Create Device</button>
+				</div>
+
+				<div class="overflow-x-auto">
+					<table class="table w-full">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>Token</th>
+								<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							for _, device := range props.Devices {
+								<tr>
+									<td>{device.Name}</td>
+									<td>
+										<div class="flex items-center gap-2">
+											<code class="bg-base-300 px-2 py-1 rounded">{device.Tokens[0].Token}</code>
+											<button class="btn btn-sm btn-ghost" onclick="copyToClipboard('{device.Tokens[0].Token}')">
+												<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+													<path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"/>
+													<path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"/>
+												</svg>
+											</button>
+										</div>
+									</td>
+									<td>
+										<button class="btn btn-sm btn-error" onclick="deleteDevice({strconv.FormatUint(uint64(device.ID), 10)})">Delete</button>
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+			<dialog id="create-device-modal" class="modal">
+				<div class="modal-box">
+					<h3 class="font-bold text-lg mb-4">Create Device</h3>
+					<form id="create-device-form" onsubmit="createDevice(event)">
+						<div class="form-control">
+							<label class="label">
+								<span class="label-text">Name</span>
+							</label>
+							<input type="text" name="name" class="input input-bordered" required/>
+						</div>
+						<div class="modal-action">
+							<button type="submit" class="btn btn-primary">Create</button>
+							<button type="button" class="btn" onclick="document.getElementById('create-device-modal').close()">Cancel</button>
+						</div>
+					</form>
+				</div>
+			</dialog>
+
+			<script>
+				async function createDevice(event) {
+					event.preventDefault();
+					const form = event.target;
+					const formData = new FormData(form);
+					const data = {
+						name: formData.get('name')
+					};
+
+					try {
+						const response = await fetch('/api/devices', {
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json'
+							},
+							body: JSON.stringify(data)
+						});
+
+						if (!response.ok) {
+							throw new Error('Failed to create device');
+						}
+
+						const result = await response.json();
+						alert('Device created successfully! Token: ' + result.token);
+						window.location.reload();
+					} catch (error) {
+						alert('Failed to create device: ' + error.message);
+					}
+				}
+
+				async function deleteDevice(id) {
+					if (!confirm('Are you sure you want to delete this device?')) {
+						return;
+					}
+
+					try {
+						const response = await fetch(`/api/devices?id=${id}`, {
+							method: 'DELETE'
+						});
+
+						if (!response.ok) {
+							throw new Error('Failed to delete device');
+						}
+
+						window.location.reload();
+					} catch (error) {
+						alert('Failed to delete device: ' + error.message);
+					}
+				}
+
+				function copyToClipboard(text) {
+					navigator.clipboard.writeText(text).then(() => {
+						alert('Token copied to clipboard!');
+					}).catch(err => {
+						console.error('Failed to copy text: ', err);
+					});
+				}
+			</script>
+		</body>
+	</html>
+} 

@@ -18,17 +18,20 @@ A web application for ordering coffee through the Terminal.shop API.
 ## Setup
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/yourusername/brewferring.git
 cd brewferring
 ```
 
 2. Install dependencies:
+
 ```bash
 go mod download
 ```
 
 3. Set up configuration:
+
 ```bash
 # Copy the template configuration file
 cp config.template.yml config.yml
@@ -38,6 +41,7 @@ nano config.yml
 ```
 
 4. Run the application:
+
 ```bash
 go run cmd/server/main.go
 ```
@@ -49,11 +53,13 @@ The application will be available at http://localhost:8080 (or the configured ho
 The application uses a YAML configuration file (`config.yml`) for its settings. A template file (`config.template.yml`) is provided as an example.
 
 Required configuration:
+
 - `oauth.client_id`: Your Terminal.shop API client ID
 - `oauth.client_secret`: Your Terminal.shop API client secret
 - `oauth.redirect_uri`: The OAuth callback URL (default: http://localhost:8080/callback)
 
 Optional configuration:
+
 - `server.port`: The port to listen on (default: 8080)
 - `server.host`: The host to listen on (default: localhost)
 
@@ -100,4 +106,4 @@ brewferring/
 
 ## License
 
-MIT License 
+MIT License

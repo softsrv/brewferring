@@ -1,0 +1,198 @@
+package templates
+
+import (
+	"context"
+	"io"
+	"strconv"
+
+	"github.com/softsrv/brewferring/internal/models"
+)
+
+type SchedulersProps struct {
+	Schedulers []models.Scheduler
+	Devices    []models.Device
+}
+
+func Schedulers(schedulers []models.Scheduler, devices []models.Device) templ.Component {
+	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) (err error) {
+		props := SchedulersProps{
+			Schedulers: schedulers,
+			Devices:    devices,
+		}
+		return SchedulersTemplate(props).Render(ctx, w)
+	})
+}
+
+templ SchedulersTemplate(props SchedulersProps) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>Schedulers - Brewferring</title>
+			<link href="https://cdn.jsdelivr.net/npm/daisyui@2.6.0/dist/full.css" rel="stylesheet" type="text/css"/>
+			<script src="https://cdn.tailwindcss.com"></script>
+		</head>
+		<body class="bg-base-200">
+			@Navbar(NavbarProps{IsAuthenticated: true})
+			<div class="container mx-auto px-4 py-8">
+				<div class="flex justify-between items-center mb-8">
+					<h1 class="text-3xl font-bold">Schedulers</h1>
+					<button class="btn btn-primary" onclick="document.getElementById('create-scheduler-modal').showModal()">Create Scheduler</button>
+				</div>
+
+				<div class="overflow-x-auto">
+					<table class="table w-full">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>Type</th>
+								<th>Details</th>
+								<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							for _, scheduler := range props.Schedulers {
+								<tr>
+									<td>{scheduler.Name}</td>
+									<td>{scheduler.Type}</td>
+									<td>
+										if scheduler.Type == "device" {
+											Device: {scheduler.Device.Name} (Threshold: {strconv.FormatFloat(scheduler.Threshold, 'f', 1, 64)})
+										} else {
+											Date: {scheduler.Date.Format("2006-01-02 15:04:05")}
+										}
+									</td>
+									<td>
+										<button class="btn btn-sm btn-error" onclick="deleteScheduler({strconv.FormatUint(uint64(scheduler.ID), 10)})">Delete</button>
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+			<dialog id="create-scheduler-modal" class="modal">
+				<div class="modal-box">
+					<h3 class="font-bold text-lg mb-4">Create Scheduler</h3>
+					<form id="create-scheduler-form" onsubmit="createScheduler(event)">
+						<div class="form-control">
+							<label class="label">
+								<span class="label-text">Name</span>
+							</label>
+							<input type="text" name="name" class="input input-bordered" required/>
+						</div>
+						<div class="form-control">
+							<label class="label">
+								<span class="label-text">Type</span>
+							</label>
+							<select name="type" class="select select-bordered" onchange="toggleSchedulerFields(this.value)" required>
+								<option value="device">Device-based</option>
+								<option value="date">Date-based</option>
+							</select>
+						</div>
+						<div class="form-control">
+							<label class="label">
+								<span class="label-text">Device</span>
+							</label>
+							<select name="device_id" class="select select-bordered" required>
+								for _, device := range props.Devices {
+									<option value={strconv.FormatUint(uint64(device.ID), 10)}>{device.Name}</option>
+								}
+							</select>
+						</div>
+						<div class="form-control" id="threshold-field">
+							<label class="label">
+								<span class="label-text">Threshold</span>
+							</label>
+							<input type="number" name="threshold" class="input input-bordered" step="0.1" required/>
+						</div>
+						<div class="form-control hidden" id="date-field">
+							<label class="label">
+								<span class="label-text">Date</span>
+							</label>
+							<input type="datetime-local" name="date" class="input input-bordered"/>
+						</div>
+						<div class="modal-action">
+							<button type="submit" class="btn btn-primary">Create</button>
+							<button type="button" class="btn" onclick="document.getElementById('create-scheduler-modal').close()">Cancel</button>
+						</div>
+					</form>
+				</div>
+			</dialog>
+
+			<script>
+				function toggleSchedulerFields(type) {
+					const thresholdField = document.getElementById('threshold-field');
+					const dateField = document.getElementById('date-field');
+					const thresholdInput = document.querySelector('input[name="threshold"]');
+					const dateInput = document.querySelector('input[name="date"]');
+
+					if (type === 'device') {
+						thresholdField.classList.remove('hidden');
+						dateField.classList.add('hidden');
+						thresholdInput.required = true;
+						dateInput.required = false;
+					} else {
+						thresholdField.classList.add('hidden');
+						dateField.classList.remove('hidden');
+						thresholdInput.required = false;
+						dateInput.required = true;
+					}
+				}
+
+				async function createScheduler(event) {
+					event.preventDefault();
+					const form = event.target;
+					const formData = new FormData(form);
+					const data = {
+						name: formData.get('name'),
+						type: formData.get('type'),
+						device_id: parseInt(formData.get('device_id')),
+						threshold: parseFloat(formData.get('threshold')),
+						date: formData.get('date')
+					};
+
+					try {
+						const response = await fetch('/api/schedulers', {
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json'
+							},
+							body: JSON.stringify(data)
+						});
+
+						if (!response.ok) {
+							throw new Error('Failed to create scheduler');
+						}
+
+						window.location.reload();
+					} catch (error) {
+						alert('Failed to create scheduler: ' + error.message);
+					}
+				}
+
+				async function deleteScheduler(id) {
+					if (!confirm('Are you sure you want to delete this scheduler?')) {
+						return;
+					}
+
+					try {
+						const response = await fetch(`/api/schedulers?id=${id}`, {
+							method: 'DELETE'
+						});
+
+						if (!response.ok) {
+							throw new Error('Failed to delete scheduler');
+						}
+
+						window.location.reload();
+					} catch (error) {
+						alert('Failed to delete scheduler: ' + error.message);
+					}
+				}
+			</script>
+		</body>
+	</html>
+} 

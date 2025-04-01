@@ -1,54 +1,59 @@
 package main
 
 import (
-	"embed"
-	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/softsrv/brewferring/internal/config"
+	"github.com/softsrv/brewferring/internal/database"
 	"github.com/softsrv/brewferring/internal/handlers"
 	"github.com/softsrv/brewferring/internal/middleware"
 )
-
-// content holds our static web server content.
-//
-//go:embed static/*
-var content embed.FS
 
 func main() {
 	// Load configuration
 	cfg, err := config.LoadConfig("config.yml")
 	if err != nil {
-		log.Fatalf("Failed to load config: %v", err)
+		log.Fatal("Failed to load configuration:", err)
 	}
 
-	// Initialize handlers
+	// Initialize database
+	if err := database.Init(); err != nil {
+		log.Fatal("Failed to initialize database:", err)
+	}
+
+	// Create handlers
 	h := handlers.NewHandlers(cfg)
 
-	// Create router
+	// Create server
 	mux := http.NewServeMux()
 
 	// Static files
-	fs := http.FileServer(http.Dir("static"))
-	mux.Handle("/static/", http.StripPrefix("/static/", fs))
+	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
-	// Routes
+	// Public routes
 	mux.HandleFunc("/", h.Home)
-	mux.HandleFunc("/dashboard", middleware.AuthMiddleware(h.Dashboard))
-	mux.HandleFunc("/products", middleware.AuthMiddleware(h.Products))
-	mux.HandleFunc("/profile", middleware.AuthMiddleware(h.Profile))
-	mux.HandleFunc("/orders", middleware.AuthMiddleware(h.Orders))
-
-	// Auth routes
 	mux.HandleFunc("/login", h.Login)
-	mux.HandleFunc("/logout", h.Logout)
-	mux.HandleFunc("/callback", h.OAuthCallback)
+	mux.HandleFunc("/oauth/callback", h.OAuthCallback)
+
+	// Protected routes
+	mux.Handle("/dashboard", middleware.Auth(http.HandlerFunc(h.Dashboard)))
+	mux.Handle("/products", middleware.Auth(http.HandlerFunc(h.Products)))
+	mux.Handle("/orders", middleware.Auth(http.HandlerFunc(h.Orders)))
+	mux.Handle("/profile", middleware.Auth(http.HandlerFunc(h.Profile)))
+	mux.Handle("/devices", middleware.Auth(http.HandlerFunc(h.Devices)))
+	mux.Handle("/schedulers", middleware.Auth(http.HandlerFunc(h.Schedulers)))
+
+	// API routes
+	mux.Handle("/api/devices", middleware.Auth(http.HandlerFunc(h.CreateDevice)))
+	mux.Handle("/api/devices/", middleware.Auth(http.HandlerFunc(h.DeleteDevice)))
+	mux.Handle("/api/schedulers", middleware.Auth(http.HandlerFunc(h.CreateScheduler)))
+	mux.Handle("/api/schedulers/", middleware.Auth(http.HandlerFunc(h.DeleteScheduler)))
+	mux.Handle("POST /api/device-data", middleware.DeviceAuth(http.HandlerFunc(h.CreateDeviceData)))
 
 	// Start server
-	addr := fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.Port)
-	log.Printf("Server starting on %s", addr)
-	if err := http.ListenAndServe(addr, mux); err != nil {
-		log.Fatal(err)
+	log.Println("Starting server on :8080")
+	if err := http.ListenAndServe(":8080", mux); err != nil {
+		log.Fatal("Failed to start server:", err)
 	}
 }
