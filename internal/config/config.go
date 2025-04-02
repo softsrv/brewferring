@@ -43,7 +43,7 @@ func LoadConfig(path string) (*Config, error) {
 
 	// Set defaults for server config
 	if config.Server.Port == 0 {
-		config.Server.Port = 8080
+		config.Server.Port = 3000
 	}
 	if config.Server.Host == "" {
 		config.Server.Host = "localhost"

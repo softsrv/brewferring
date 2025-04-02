@@ -4,5 +4,5 @@ oauth:
   redirect_uri: "http://localhost:8080/callback"
 
 server:
-  port: 8080
+  port: 3000
   host: "localhost" 

@@ -479,6 +479,7 @@ func (h *Handlers) OAuthCallback(w http.ResponseWriter, r *http.Request) {
 	// Make the token exchange request
 	resp, err := http.PostForm(h.oauthConfig.TokenEndpoint, values)
 	if err != nil {
+		log.Printf("Failed to exchange code for token: %v", err)
 		http.Error(w, "Failed to exchange code for token", http.StatusInternalServerError)
 		return
 	}
@@ -487,6 +488,7 @@ func (h *Handlers) OAuthCallback(w http.ResponseWriter, r *http.Request) {
 	// Read the response body
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
+		log.Printf("Failed to read token response: %v", err)
 		http.Error(w, "Failed to read token response", http.StatusInternalServerError)
 		return
 	}
@@ -498,6 +500,7 @@ func (h *Handlers) OAuthCallback(w http.ResponseWriter, r *http.Request) {
 		ExpiresIn   int    `json:"expires_in"`
 	}
 	if err := json.Unmarshal(body, &tokenResp); err != nil {
+		log.Printf("Failed to parse token response: %v", err)
 		http.Error(w, "Failed to parse token response", http.StatusInternalServerError)
 		return
 	}
@@ -506,6 +509,7 @@ func (h *Handlers) OAuthCallback(w http.ResponseWriter, r *http.Request) {
 	client := terminal.NewClient(option.WithBearerToken(tokenResp.AccessToken))
 	profile, err := client.Profile.Me(r.Context())
 	if err != nil {
+		log.Printf("Failed to fetch profile: %v", err)
 		http.Error(w, "Failed to fetch profile", http.StatusInternalServerError)
 		return
 	}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -34,7 +35,7 @@ func main() {
 	// Public routes
 	mux.HandleFunc("/", h.Home)
 	mux.HandleFunc("/login", h.Login)
-	mux.HandleFunc("/oauth/callback", h.OAuthCallback)
+	mux.HandleFunc("/callback", h.OAuthCallback)
 
 	// Protected routes
 	mux.Handle("/dashboard", middleware.Auth(http.HandlerFunc(h.Dashboard)))
@@ -49,11 +50,11 @@ func main() {
 	mux.Handle("/api/devices/", middleware.Auth(http.HandlerFunc(h.DeleteDevice)))
 	mux.Handle("/api/schedulers", middleware.Auth(http.HandlerFunc(h.CreateScheduler)))
 	mux.Handle("/api/schedulers/", middleware.Auth(http.HandlerFunc(h.DeleteScheduler)))
-	mux.Handle("POST /api/device-data", middleware.DeviceAuth(http.HandlerFunc(h.CreateDeviceData)))
+	mux.Handle("/api/device-data", middleware.DeviceAuth(http.HandlerFunc(h.CreateDeviceData)))
 
 	// Start server
-	log.Println("Starting server on :8080")
-	if err := http.ListenAndServe(":8080", mux); err != nil {
+	log.Println("Starting server on", cfg.Server.Port)
+	if err := http.ListenAndServe(fmt.Sprintf(":%d", cfg.Server.Port), mux); err != nil {
 		log.Fatal("Failed to start server:", err)
 	}
 }
