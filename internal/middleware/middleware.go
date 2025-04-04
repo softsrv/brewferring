@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"log"
 	"net/http"
 	"strings"
 
@@ -13,6 +14,7 @@ func Auth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("access_token")
 		if err != nil {
+			log.Println("No access token found")
 			http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 			return
 		}

@@ -38,18 +38,18 @@ func main() {
 	mux.HandleFunc("/callback", h.OAuthCallback)
 
 	// Protected routes
-	mux.Handle("/dashboard", middleware.Auth(http.HandlerFunc(h.Dashboard)))
-	mux.Handle("/products", middleware.Auth(http.HandlerFunc(h.Products)))
-	mux.Handle("/orders", middleware.Auth(http.HandlerFunc(h.Orders)))
-	mux.Handle("/profile", middleware.Auth(http.HandlerFunc(h.Profile)))
-	mux.Handle("/devices", middleware.Auth(http.HandlerFunc(h.Devices)))
-	mux.Handle("/schedulers", middleware.Auth(http.HandlerFunc(h.Schedulers)))
+	mux.Handle("GET /dashboard", middleware.Auth(http.HandlerFunc(h.Dashboard)))
+	mux.Handle("GET /products", middleware.Auth(http.HandlerFunc(h.Products)))
+	mux.Handle("GET /orders", middleware.Auth(http.HandlerFunc(h.Orders)))
+	mux.Handle("GET /profile", middleware.Auth(http.HandlerFunc(h.Profile)))
+	mux.Handle("GET /devices", middleware.Auth(http.HandlerFunc(h.Devices)))
+	mux.Handle("GET /schedulers", middleware.Auth(http.HandlerFunc(h.Schedulers)))
+	mux.Handle("POST /devices", middleware.Auth(http.HandlerFunc(h.CreateDevice)))
+	mux.Handle("DELETE /devices", middleware.Auth(http.HandlerFunc(h.DeleteDevice)))
+	mux.Handle("POST /schedulers", middleware.Auth(http.HandlerFunc(h.CreateScheduler)))
+	mux.Handle("DELETE /schedulers", middleware.Auth(http.HandlerFunc(h.DeleteScheduler)))
 
 	// API routes
-	mux.Handle("/api/devices", middleware.Auth(http.HandlerFunc(h.CreateDevice)))
-	mux.Handle("/api/devices/", middleware.Auth(http.HandlerFunc(h.DeleteDevice)))
-	mux.Handle("/api/schedulers", middleware.Auth(http.HandlerFunc(h.CreateScheduler)))
-	mux.Handle("/api/schedulers/", middleware.Auth(http.HandlerFunc(h.DeleteScheduler)))
 	mux.Handle("/api/device-data", middleware.DeviceAuth(http.HandlerFunc(h.CreateDeviceData)))
 
 	// Start server
