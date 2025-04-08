@@ -45,12 +45,12 @@ func main() {
 	mux.Handle("GET /devices", middleware.Auth(http.HandlerFunc(h.Devices)))
 	mux.Handle("GET /schedulers", middleware.Auth(http.HandlerFunc(h.Schedulers)))
 	mux.Handle("POST /devices", middleware.Auth(http.HandlerFunc(h.CreateDevice)))
-	mux.Handle("DELETE /devices", middleware.Auth(http.HandlerFunc(h.DeleteDevice)))
+	mux.Handle("DELETE /devices/{id}", middleware.Auth(http.HandlerFunc(h.DeleteDevice)))
 	mux.Handle("POST /schedulers", middleware.Auth(http.HandlerFunc(h.CreateScheduler)))
-	mux.Handle("DELETE /schedulers", middleware.Auth(http.HandlerFunc(h.DeleteScheduler)))
+	mux.Handle("DELETE /schedulers/{id}", middleware.Auth(http.HandlerFunc(h.DeleteScheduler)))
 
 	// API routes
-	mux.Handle("/api/device-data", middleware.DeviceAuth(http.HandlerFunc(h.CreateDeviceData)))
+	mux.Handle("/api/devices/data", middleware.DeviceAuth(http.HandlerFunc(h.CreateDeviceData)))
 
 	// Start server
 	log.Println("Starting server on", cfg.Server.Port)

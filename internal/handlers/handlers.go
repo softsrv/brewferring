@@ -247,7 +247,8 @@ func (h *Handlers) DeleteDevice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	deviceID, err := strconv.ParseUint(r.URL.Query().Get("id"), 10, 32)
+	id := r.PathValue("id")
+	deviceID, err := strconv.ParseUint(id, 10, 32)
 	if err != nil {
 		http.Error(w, "Invalid device ID", http.StatusBadRequest)
 		return
@@ -411,7 +412,8 @@ func (h *Handlers) DeleteScheduler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	schedulerID, err := strconv.ParseUint(r.URL.Query().Get("id"), 10, 32)
+	id := r.PathValue("id")
+	schedulerID, err := strconv.ParseUint(id, 10, 32)
 	if err != nil {
 		http.Error(w, "Invalid scheduler ID", http.StatusBadRequest)
 		return

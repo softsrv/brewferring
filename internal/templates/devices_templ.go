@@ -10,9 +10,9 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"context"
-	"io"
-
 	"github.com/softsrv/brewferring/internal/models"
+	"io"
+	"strconv"
 )
 
 type DevicesProps struct {
@@ -57,7 +57,7 @@ func DevicesTemplate(props DevicesProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"container mx-auto px-4 py-8\"><div class=\"flex justify-between items-center mb-8\"><h1 class=\"text-3xl font-bold\">Devices</h1><button class=\"btn btn-primary\" onclick=\"document.getElementById(&#39;create-device-modal&#39;).showModal()\">Create Device</button></div><div class=\"overflow-x-auto\"><table class=\"table w-full\"><thead><tr><th>Name</th><th>Token</th><th>Actions</th></tr></thead> <tbody>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"container mx-auto px-4 py-8\"><div class=\"flex justify-between items-center mb-8\"><h1 class=\"text-3xl font-bold\">Devices</h1><button class=\"btn btn-primary\" onclick=\"document.getElementById(&#39;create-device-modal&#39;).showModal()\">Create Device</button></div><div class=\"overflow-x-auto\"><table class=\"table w-full\"><thead><tr><th>Name</th><th>Actions</th></tr></thead> <tbody>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -69,31 +69,31 @@ func DevicesTemplate(props DevicesProps) templ.Component {
 			var templ_7745c5c3_Var2 string
 			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(device.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/devices.templ`, Line: 53, Col: 25}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/devices.templ`, Line: 52, Col: 25}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</td><td><div class=\"flex items-center gap-2\"><code class=\"bg-base-300 px-2 py-1 rounded\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</td><td><button class=\"btn btn-sm btn-error\" hx-delete=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
-			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(device.Tokens[0].Token)
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs("/devices/" + strconv.FormatInt(int64(device.ID), 10))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/devices.templ`, Line: 56, Col: 78}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/devices.templ`, Line: 54, Col: 111}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</code> <button class=\"btn btn-sm btn-ghost\" onclick=\"copyToClipboard(&#39;{device.Tokens[0].Token}&#39;)\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" viewBox=\"0 0 20 20\" fill=\"currentColor\"><path d=\"M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z\"></path> <path d=\"M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z\"></path></svg></button></div></td><td><button class=\"btn btn-sm btn-error\" onclick=\"deleteDevice({strconv.FormatUint(uint64(device.ID), 10)})\">Delete</button></td></tr>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" hx-target=\"closest tr\">Delete</button></td></tr>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</tbody></table></div></div><dialog id=\"create-device-modal\" class=\"modal\"><div class=\"modal-box\"><h3 class=\"font-bold text-lg mb-4\">Create Device</h3><form id=\"create-device-form\" onsubmit=\"createDevice(event)\"><div class=\"form-control\"><label class=\"label\"><span class=\"label-text\">Name</span></label> <input type=\"text\" name=\"name\" class=\"input input-bordered\" required></div><div class=\"modal-action\"><button type=\"submit\" class=\"btn btn-primary\">Create</button> <button type=\"button\" class=\"btn\" onclick=\"document.getElementById(&#39;create-device-modal&#39;).close()\">Cancel</button></div></form></div></dialog><script>\n\t\t\t\tasync function createDevice(event) {\n\t\t\t\t\tevent.preventDefault();\n\t\t\t\t\tconst form = event.target;\n\t\t\t\t\tconst formData = new FormData(form);\n\t\t\t\t\tconst data = {\n\t\t\t\t\t\tname: formData.get('name')\n\t\t\t\t\t};\n\n\t\t\t\t\ttry {\n\t\t\t\t\t\tconst response = await fetch('/api/devices', {\n\t\t\t\t\t\t\tmethod: 'POST',\n\t\t\t\t\t\t\theaders: {\n\t\t\t\t\t\t\t\t'Content-Type': 'application/json'\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\tbody: JSON.stringify(data)\n\t\t\t\t\t\t});\n\n\t\t\t\t\t\tif (!response.ok) {\n\t\t\t\t\t\t\tthrow new Error('Failed to create device');\n\t\t\t\t\t\t}\n\n\t\t\t\t\t\tconst result = await response.json();\n\t\t\t\t\t\talert('Device created successfully! Token: ' + result.token);\n\t\t\t\t\t\twindow.location.reload();\n\t\t\t\t\t} catch (error) {\n\t\t\t\t\t\talert('Failed to create device: ' + error.message);\n\t\t\t\t\t}\n\t\t\t\t}\n\n\t\t\t\tasync function deleteDevice(id) {\n\t\t\t\t\tif (!confirm('Are you sure you want to delete this device?')) {\n\t\t\t\t\t\treturn;\n\t\t\t\t\t}\n\n\t\t\t\t\ttry {\n\t\t\t\t\t\tconst response = await fetch(`/api/devices?id=${id}`, {\n\t\t\t\t\t\t\tmethod: 'DELETE'\n\t\t\t\t\t\t});\n\n\t\t\t\t\t\tif (!response.ok) {\n\t\t\t\t\t\t\tthrow new Error('Failed to delete device');\n\t\t\t\t\t\t}\n\n\t\t\t\t\t\twindow.location.reload();\n\t\t\t\t\t} catch (error) {\n\t\t\t\t\t\talert('Failed to delete device: ' + error.message);\n\t\t\t\t\t}\n\t\t\t\t}\n\n\t\t\t\tfunction copyToClipboard(text) {\n\t\t\t\t\tnavigator.clipboard.writeText(text).then(() => {\n\t\t\t\t\t\talert('Token copied to clipboard!');\n\t\t\t\t\t}).catch(err => {\n\t\t\t\t\t\tconsole.error('Failed to copy text: ', err);\n\t\t\t\t\t});\n\t\t\t\t}\n\t\t\t</script></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</tbody></table></div></div><dialog id=\"create-device-modal\" class=\"modal\"><div class=\"modal-box\"><h3 class=\"font-bold text-lg mb-4\">Create Device</h3><form id=\"create-device-form\" onsubmit=\"createDevice(event)\"><div class=\"form-control\"><label class=\"label\"><span class=\"label-text\">Name</span></label> <input type=\"text\" name=\"name\" class=\"input input-bordered\" required></div><div class=\"modal-action\"><button type=\"submit\" class=\"btn btn-primary\">Create</button> <button type=\"button\" class=\"btn\" onclick=\"document.getElementById(&#39;create-device-modal&#39;).close()\">Cancel</button></div></form></div></dialog><script>\n\t\t\t\tasync function createDevice(event) {\n\t\t\t\t\tevent.preventDefault();\n\t\t\t\t\tconst form = event.target;\n\t\t\t\t\tconst formData = new FormData(form);\n\t\t\t\t\tconst data = {\n\t\t\t\t\t\tname: formData.get('name')\n\t\t\t\t\t};\n\t\t\t\t\tconsole.log(data)\n\n\t\t\t\t\ttry {\n\t\t\t\t\t\tconst response = await fetch('/devices', {\n\t\t\t\t\t\t\tmethod: 'POST',\n\t\t\t\t\t\t\theaders: {\n\t\t\t\t\t\t\t\t'Content-Type': 'application/json'\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\tbody: JSON.stringify(data)\n\t\t\t\t\t\t});\n\n\t\t\t\t\t\tif (!response.ok) {\n\t\t\t\t\t\t\tthrow new Error('Failed to create device');\n\t\t\t\t\t\t}\n\n\t\t\t\t\t\tconst result = await response.json();\n\t\t\t\t\t\talert('Device created successfully! Token: ' + result.token);\n\t\t\t\t\t\twindow.location.reload();\n\t\t\t\t\t} catch (error) {\n\t\t\t\t\t\talert('Failed to create device: ' + error.message);\n\t\t\t\t\t}\n\t\t\t\t}\n\n\t\t\t\tasync function deleteDevice(id) {\n\t\t\t\t\tif (!confirm('Are you sure you want to delete this device?')) {\n\t\t\t\t\t\treturn;\n\t\t\t\t\t}\n\n\t\t\t\t\ttry {\n\t\t\t\t\t\tconst response = await fetch(`/devices/${id}`, {\n\t\t\t\t\t\t\tmethod: 'DELETE'\n\t\t\t\t\t\t});\n\n\t\t\t\t\t\tif (!response.ok) {\n\t\t\t\t\t\t\tthrow new Error('Failed to delete device');\n\t\t\t\t\t\t}\n\n\t\t\t\t\t\twindow.location.reload();\n\t\t\t\t\t} catch (error) {\n\t\t\t\t\t\talert('Failed to delete device: ' + error.message);\n\t\t\t\t\t}\n\t\t\t\t}\n\n\t\t\t\tfunction copyToClipboard(text) {\n\t\t\t\t\tnavigator.clipboard.writeText(text).then(() => {\n\t\t\t\t\t\talert('Token copied to clipboard!');\n\t\t\t\t\t}).catch(err => {\n\t\t\t\t\t\tconsole.error('Failed to copy text: ', err);\n\t\t\t\t\t});\n\t\t\t\t}\n\t\t\t</script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

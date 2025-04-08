@@ -2,7 +2,7 @@ package database
 
 import (
 	"crypto/rand"
-	"encoding/base64"
+	"encoding/hex"
 
 	"github.com/softsrv/brewferring/internal/models"
 	"gorm.io/driver/sqlite"
@@ -28,11 +28,11 @@ func Init() error {
 }
 
 func GenerateDeviceToken() (string, error) {
-	b := make([]byte, 32)
+	b := make([]byte, 24)
 	if _, err := rand.Read(b); err != nil {
 		return "", err
 	}
-	return base64.URLEncoding.EncodeToString(b), nil
+	return "dt_" + hex.EncodeToString(b), nil
 }
 
 func SaveDeviceData(data *models.DeviceData) error {

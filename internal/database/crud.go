@@ -1,8 +1,6 @@
 package database
 
 import (
-	"crypto/rand"
-	"encoding/base64"
 	"errors"
 	"time"
 
@@ -36,34 +34,6 @@ func GetDevicesByUserID(userID uint) ([]models.Device, error) {
 
 func DeleteDevice(deviceID uint) error {
 	return DB.Delete(&models.Device{}, deviceID).Error
-}
-
-// DeviceToken CRUD operations
-func generateToken() (string, error) {
-	bytes := make([]byte, 24)
-	if _, err := rand.Read(bytes); err != nil {
-		return "", err
-	}
-	return "dt_" + base64.URLEncoding.EncodeToString(bytes), nil
-}
-
-func CreateDeviceToken(deviceID uint) (*models.DeviceToken, error) {
-	token, err := generateToken()
-	if err != nil {
-		return nil, err
-	}
-
-	deviceToken := &models.DeviceToken{
-		Token:    token,
-		DeviceID: deviceID,
-	}
-
-	err = DB.Create(deviceToken).Error
-	if err != nil {
-		return nil, err
-	}
-
-	return deviceToken, nil
 }
 
 func GetDeviceToken(token string) (*models.DeviceToken, error) {

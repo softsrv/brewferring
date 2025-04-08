@@ -25,21 +25,15 @@ templ ProfileView(profile Profile) {
 					<div class="card-body">
 						<div class="form-control">
 							<label class="label">
-								<span class="label-text">Name</span>
-							</label>
-							<input type="text" value={ profile.Name } class="input input-bordered" readonly/>
-						</div>
-						<div class="form-control">
-							<label class="label">
 								<span class="label-text">Email</span>
 							</label>
-							<input type="email" value={ profile.Email } class="input input-bordered" readonly/>
+							<p class="text-lg">{ profile.Email }</p>
 						</div>
 						<div class="form-control">
 							<label class="label">
 								<span class="label-text">Member Since</span>
 							</label>
-							<input type="text" value={ profile.CreatedAt } class="input input-bordered" readonly/>
+							<p class="text-lg">{ profile.CreatedAt }</p>
 						</div>
 					</div>
 				</div>

@@ -3,7 +3,7 @@ package templates
 import (
 	"context"
 	"io"
-
+	"strconv"
 	"github.com/softsrv/brewferring/internal/models"
 )
 
@@ -43,7 +43,6 @@ templ DevicesTemplate(props DevicesProps) {
 						<thead>
 							<tr>
 								<th>Name</th>
-								<th>Token</th>
 								<th>Actions</th>
 							</tr>
 						</thead>
@@ -52,18 +51,7 @@ templ DevicesTemplate(props DevicesProps) {
 								<tr>
 									<td>{device.Name}</td>
 									<td>
-										<div class="flex items-center gap-2">
-											<code class="bg-base-300 px-2 py-1 rounded">{device.Tokens[0].Token}</code>
-											<button class="btn btn-sm btn-ghost" onclick="copyToClipboard('{device.Tokens[0].Token}')">
-												<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-													<path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"/>
-													<path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"/>
-												</svg>
-											</button>
-										</div>
-									</td>
-									<td>
-										<button class="btn btn-sm btn-error" onclick="deleteDevice({strconv.FormatUint(uint64(device.ID), 10)})">Delete</button>
+										<button class="btn btn-sm btn-error" hx-delete={"/devices/" + strconv.FormatInt(int64(device.ID), 10)} hx-target="closest tr">Delete</button>
 									</td>
 								</tr>
 							}
@@ -98,9 +86,10 @@ templ DevicesTemplate(props DevicesProps) {
 					const data = {
 						name: formData.get('name')
 					};
+					console.log(data)
 
 					try {
-						const response = await fetch('/api/devices', {
+						const response = await fetch('/devices', {
 							method: 'POST',
 							headers: {
 								'Content-Type': 'application/json'
@@ -126,7 +115,7 @@ templ DevicesTemplate(props DevicesProps) {
 					}
 
 					try {
-						const response = await fetch(`/api/devices?id=${id}`, {
+						const response = await fetch(`/devices/${id}`, {
 							method: 'DELETE'
 						});
 
