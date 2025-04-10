@@ -10,9 +10,11 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/softsrv/brewferring/internal/components"
 	"github.com/softsrv/brewferring/internal/config"
 	ctx "github.com/softsrv/brewferring/internal/context"
 	"github.com/softsrv/brewferring/internal/database"
+	"github.com/softsrv/brewferring/internal/middleware"
 	"github.com/softsrv/brewferring/internal/models"
 	"github.com/softsrv/brewferring/internal/templates"
 	"github.com/terminaldotshop/terminal-sdk-go"
@@ -59,8 +61,16 @@ func (h *Handlers) getClient(r *http.Request) *terminal.Client {
 }
 
 func (h *Handlers) Home(w http.ResponseWriter, r *http.Request) {
+	token, _ := middleware.GetAccessTokenFromHeader(r)
+
+	// Add access token to context so that home page navbar can show
+	// if user is logged in
+	ct1 := r.Context()
+	if len(token) > 0 {
+		ct1 = ctx.WithAccessToken(ct1, token)
+	}
 	component := templates.Home()
-	component.Render(r.Context(), w)
+	component.Render(ct1, w)
 }
 
 func (h *Handlers) Dashboard(w http.ResponseWriter, r *http.Request) {
@@ -99,10 +109,9 @@ func (h *Handlers) Profile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	templateProfile := templates.Profile{
-		ID:        profile.Data.User.ID,
-		Email:     profile.Data.User.Email,
-		Name:      profile.Data.User.Name,
-		CreatedAt: time.Now().Format(time.RFC3339), // Since we don't have CreatedAt from the API
+		ID:    profile.Data.User.ID,
+		Email: profile.Data.User.Email,
+		Name:  profile.Data.User.Name,
 	}
 
 	templates.ProfileView(templateProfile).Render(r.Context(), w)
@@ -159,7 +168,7 @@ func (h *Handlers) Devices(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	devices, err := database.GetUserDevices(user.ID)
+	devices, err := database.GetDevicesByUserID(user.ID)
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
@@ -188,11 +197,16 @@ func (h *Handlers) CreateDevice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var req struct {
-		Name string `json:"name"`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	if err := r.ParseForm(); err != nil {
+		log.Printf("unable to parse form data: %s", err)
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	name := r.FormValue("name")
+	if len(name) <= 0 || len(name) > 50 {
+		log.Println("invalid device name specified")
+		http.Error(w, "Invalid device name. Must be 1-50 characters", http.StatusBadRequest)
 		return
 	}
 
@@ -203,29 +217,18 @@ func (h *Handlers) CreateDevice(w http.ResponseWriter, r *http.Request) {
 	}
 
 	device := &models.Device{
-		Name:   req.Name,
+		Name:   name,
 		UserID: user.ID,
+		Token:  token,
 	}
 
 	if err := database.CreateDevice(device); err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
-
-	deviceToken := &models.DeviceToken{
-		Token:    token,
-		DeviceID: device.ID,
-	}
-
-	if err := database.DB.Create(deviceToken).Error; err != nil {
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
-	}
-
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(map[string]string{
-		"token": token,
-	})
+	component := components.CreateDeviceResponseComponent(device)
+	component.Render(r.Context(), w)
 }
 
 func (h *Handlers) DeleteDevice(w http.ResponseWriter, r *http.Request) {
@@ -293,13 +296,13 @@ func (h *Handlers) Schedulers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	schedulers, err := database.GetUserSchedulers(user.ID)
+	schedulers, err := database.GetSchedulersByUserID(user.ID)
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 
-	devices, err := database.GetUserDevices(user.ID)
+	devices, err := database.GetDevicesByUserID(user.ID)
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
@@ -328,37 +331,26 @@ func (h *Handlers) CreateScheduler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var req struct {
-		Name      string  `json:"name"`
-		Type      string  `json:"type"`
-		DeviceID  uint    `json:"device_id"`
-		Threshold float64 `json:"threshold,omitempty"`
-		Date      string  `json:"date,omitempty"`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	if err := r.ParseForm(); err != nil {
+		log.Printf("unable to parse form data: %s", err)
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
-	// Validate request
-	if req.Type != "device" && req.Type != "date" {
-		http.Error(w, "Invalid scheduler type", http.StatusBadRequest)
-		return
-	}
+	name := r.FormValue("name")
+	deviceID := r.FormValue("device_id")
+	threshold := r.FormValue("threshold")
+	date := r.FormValue("date")
 
-	if req.Type == "device" && req.Threshold == 0 {
-		http.Error(w, "Threshold is required for device-based scheduling", http.StatusBadRequest)
-		return
-	}
-
-	if req.Type == "date" && req.Date == "" {
-		http.Error(w, "Date is required for date-based scheduling", http.StatusBadRequest)
+	if len(name) <= 0 || len(name) > 50 {
+		log.Println("invalid device name specified")
+		http.Error(w, "Invalid device name. Must be 1-50 characters", http.StatusBadRequest)
 		return
 	}
 
 	// Check if device belongs to user
 	var device models.Device
-	if err := database.DB.First(&device, req.DeviceID).Error; err != nil {
+	if err := database.DB.First(&device, deviceID).Error; err != nil {
 		http.Error(w, "Device not found", http.StatusNotFound)
 		return
 	}
@@ -368,16 +360,26 @@ func (h *Handlers) CreateScheduler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	scheduler := &models.Scheduler{
-		Name:      req.Name,
-		UserID:    user.ID,
-		DeviceID:  req.DeviceID,
-		Type:      req.Type,
-		Threshold: req.Threshold,
+	dID, err := strconv.ParseUint(deviceID, 10, 64)
+	if err != nil {
+		http.Error(w, "Invalid device ID provided", http.StatusBadRequest)
+		return
+	}
+	thresh, err := strconv.ParseFloat(threshold, 64)
+	if err != nil {
+		http.Error(w, "Invalid scheduler threshold provided", http.StatusBadRequest)
+		return
 	}
 
-	if req.Type == "date" {
-		date, err := time.Parse(time.RFC3339, req.Date)
+	scheduler := &models.Scheduler{
+		Name:      name,
+		UserID:    user.ID,
+		DeviceID:  uint(dID),
+		Threshold: thresh,
+	}
+
+	if len(date) > 0 {
+		date, err := time.Parse(time.RFC3339, date)
 		if err != nil {
 			http.Error(w, "Invalid date format", http.StatusBadRequest)
 			return
@@ -391,6 +393,8 @@ func (h *Handlers) CreateScheduler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
+	component := components.CreateSchedulerResponseComponent(scheduler)
+	component.Render(r.Context(), w)
 }
 
 func (h *Handlers) DeleteScheduler(w http.ResponseWriter, r *http.Request) {
@@ -456,6 +460,7 @@ func (h *Handlers) Logout(w http.ResponseWriter, r *http.Request) {
 		Name:     "access_token",
 		Value:    "",
 		Path:     "/",
+		MaxAge:   -1,
 		HttpOnly: true,
 		Secure:   true,
 	}
@@ -520,7 +525,6 @@ func (h *Handlers) OAuthCallback(w http.ResponseWriter, r *http.Request) {
 	user := &models.User{
 		TerminalID: profile.Data.User.ID,
 		Email:      profile.Data.User.Email,
-		Name:       profile.Data.User.Name,
 	}
 
 	existingUser, err := database.GetUserByTerminalID(user.TerminalID)
@@ -570,7 +574,6 @@ func (h *Handlers) getUserFromToken(accessToken string) (*models.User, error) {
 		user = &models.User{
 			TerminalID: profile.Data.User.ID,
 			Email:      profile.Data.User.Email,
-			Name:       profile.Data.User.Name,
 		}
 		if err := database.CreateUser(user); err != nil {
 			return nil, err
@@ -578,7 +581,6 @@ func (h *Handlers) getUserFromToken(accessToken string) (*models.User, error) {
 	} else {
 		// Update user information if needed
 		user.Email = profile.Data.User.Email
-		user.Name = profile.Data.User.Name
 		if err := database.DB.Save(user).Error; err != nil {
 			return nil, err
 		}
@@ -643,35 +645,9 @@ func (h *Handlers) CreateDeviceData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Get device token from Authorization header
-	authHeader := r.Header.Get("Authorization")
-	if authHeader == "" {
-		http.Error(w, "No authorization header", http.StatusUnauthorized)
-		return
-	}
-
-	// Extract token from "Bearer <token>"
-	if len(authHeader) <= 7 || authHeader[:7] != "Bearer " {
-		http.Error(w, "Invalid authorization header", http.StatusUnauthorized)
-		return
-	}
-	token := authHeader[7:]
-
-	// Get device token from database
-	deviceToken, err := database.GetDeviceToken(token)
-	if err != nil {
-		http.Error(w, "Invalid token", http.StatusUnauthorized)
-		return
-	}
-
-	// Check rate limiting
-	isLimited, err := database.IsDeviceTokenRateLimited(deviceToken.ID)
-	if err != nil {
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
-	}
-	if isLimited {
-		http.Error(w, "Rate limit exceeded", http.StatusTooManyRequests)
+	device, ok := ctx.GetDevice(r.Context())
+	if !ok {
+		http.Error(w, "No device found", http.StatusNotFound)
 		return
 	}
 
@@ -686,10 +662,8 @@ func (h *Handlers) CreateDeviceData(w http.ResponseWriter, r *http.Request) {
 
 	// Create device data
 	data := &models.DeviceData{
-		DeviceID:      deviceToken.DeviceID,
-		DeviceTokenID: deviceToken.ID,
-		Value:         req.Value,
-		CreatedAt:     time.Now(),
+		DeviceID: device.ID,
+		Value:    req.Value,
 	}
 
 	if err := database.CreateDeviceData(data); err != nil {
@@ -698,7 +672,7 @@ func (h *Handlers) CreateDeviceData(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Update last used timestamp
-	if err := database.UpdateDeviceTokenLastUsedAt(deviceToken.ID); err != nil {
+	if err := database.UpdateDeviceTokenLastUsedAt(device); err != nil {
 		log.Printf("Failed to update device token last used at: %v", err)
 	}
 

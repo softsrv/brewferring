@@ -1,15 +1,14 @@
 package templates
 
-type NavbarProps struct {
-	IsAuthenticated bool
-}
 
-templ Navbar(props NavbarProps) {
+import "github.com/softsrv/brewferring/internal/context"
+
+templ Navbar() {
 	<div class="navbar bg-base-100">
 		<div class="flex-1">
 			<a href="/" class="btn btn-ghost text-xl">Brewferring</a>
 		</div>
-		if props.IsAuthenticated {
+		if context.HasAccessTokenValue(ctx) {
 			<div class="flex-none gap-2">
 				<a href="/products" class="btn btn-ghost">Products</a>
 				<a href="/orders" class="btn btn-ghost">Orders</a>
@@ -33,4 +32,4 @@ templ Navbar(props NavbarProps) {
 			</div>
 		}
 	</div>
-} 
+}

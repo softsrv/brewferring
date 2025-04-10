@@ -1,0 +1,40 @@
+package components
+import (
+  "github.com/softsrv/brewferring/internal/models"
+  "strconv"
+)
+
+templ CreateSchedulerResponseComponent(scheduler *models.Scheduler) {
+	<h3 class="font-bold text-lg mb-4">Your Scheduler</h3>
+	<div class="form-control">
+	<div>
+		<label class="input">
+			<span class="label">Name: </span>
+			<span>{scheduler.Name}</span>
+		</label>
+		</div>
+		<div>
+		<label class="input">
+			<span class="label">Device Name: </span>
+			<span>{scheduler.Device.Name}</span>
+		</label>
+		</div>
+    <div>
+    if scheduler.Date.IsZero() {
+		<label class="input">
+			<span class="label">Threshold: </span>
+			<span>{strconv.FormatFloat(scheduler.Threshold, 'f', -1, 64)}</span>
+		</label>
+    } else {
+    <label class="input">
+			<span class="label">Date: </span>
+			<span>{scheduler.Date.String()}</span>
+		</label>
+    }
+		</div>
+
+	</div>
+	<div class="modal-action">
+		<button type="button" class="btn btn-primary" onclick="window.location.reload()">ok</button>
+	</div>
+}

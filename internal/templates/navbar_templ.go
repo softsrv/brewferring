@@ -8,11 +8,9 @@ package templates
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-type NavbarProps struct {
-	IsAuthenticated bool
-}
+import "github.com/softsrv/brewferring/internal/context"
 
-func Navbar(props NavbarProps) templ.Component {
+func Navbar() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -37,7 +35,7 @@ func Navbar(props NavbarProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if props.IsAuthenticated {
+		if context.HasAccessTokenValue(ctx) {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"flex-none gap-2\"><a href=\"/products\" class=\"btn btn-ghost\">Products</a> <a href=\"/orders\" class=\"btn btn-ghost\">Orders</a> <a href=\"/devices\" class=\"btn btn-ghost\">Devices</a> <a href=\"/schedulers\" class=\"btn btn-ghost\">Schedulers</a><div class=\"dropdown dropdown-end\"><div tabindex=\"0\" role=\"button\" class=\"btn btn-ghost btn-circle avatar\"><svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" class=\"w-6 h-6 stroke-current\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M4 6h16M4 12h16M4 18h16\"></path></svg></div><ul tabindex=\"0\" class=\"mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52\"><li><a href=\"/profile\">Profile</a></li><li><a href=\"/logout\">Logout</a></li></ul></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err

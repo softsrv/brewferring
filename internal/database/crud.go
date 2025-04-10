@@ -32,37 +32,40 @@ func GetDevicesByUserID(userID uint) ([]models.Device, error) {
 	return devices, err
 }
 
+func GetDeviceByToken(token string) (models.Device, error) {
+	var device models.Device
+	err := DB.Where("token = ?", token).First(&device).Error
+	return device, err
+}
+
 func DeleteDevice(deviceID uint) error {
 	return DB.Delete(&models.Device{}, deviceID).Error
 }
 
-func GetDeviceToken(token string) (*models.DeviceToken, error) {
-	var deviceToken models.DeviceToken
-	err := DB.Where("token = ?", token).First(&deviceToken).Error
-	if err != nil {
-		return nil, err
-	}
-	return &deviceToken, nil
-}
-
-func UpdateDeviceTokenLastUsedAt(tokenID uint) error {
+func UpdateDeviceTokenLastUsedAt(device *models.Device) error {
 	now := time.Now()
-	return DB.Model(&models.DeviceToken{}).Where("id = ?", tokenID).Update("last_used_at", now).Error
+	return DB.Model(&models.User{}).Where("id = ?", device.ID).Update("token_last_used_at", now).Error
 }
 
-func IsDeviceTokenRateLimited(tokenID uint) (bool, error) {
-	var token models.DeviceToken
-	err := DB.First(&token, tokenID).Error
+func IsDeviceTokenRateLimited(deviceID uint) (bool, error) {
+	var device models.Device
+
+	err := DB.Where("id = ?", deviceID).First(&device).Error
 	if err != nil {
 		return true, err
 	}
 
-	if token.LastUsedAt.IsZero() {
+	// Check if more than 1 hour has passed since last use
+	return CheckIsTokenLimited(device.TokenLastUsedAt)
+}
+
+func CheckIsTokenLimited(lastUsed time.Time) (bool, error) {
+	if lastUsed.IsZero() {
 		return false, nil
 	}
 
 	// Check if more than 1 hour has passed since last use
-	return time.Since(token.LastUsedAt) < time.Hour, nil
+	return time.Since(lastUsed) < time.Hour, nil
 }
 
 // Scheduler CRUD operations

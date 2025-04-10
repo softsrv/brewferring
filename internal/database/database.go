@@ -19,7 +19,7 @@ func Init() error {
 	}
 
 	// Auto migrate the schema
-	err = DB.AutoMigrate(&models.User{}, &models.Device{}, &models.DeviceToken{}, &models.DeviceData{}, &models.Scheduler{})
+	err = DB.AutoMigrate(&models.User{}, &models.Device{}, &models.DeviceData{}, &models.Scheduler{})
 	if err != nil {
 		return err
 	}
@@ -37,22 +37,4 @@ func GenerateDeviceToken() (string, error) {
 
 func SaveDeviceData(data *models.DeviceData) error {
 	return DB.Create(data).Error
-}
-
-func GetUserDevices(userID uint) ([]models.Device, error) {
-	var devices []models.Device
-	err := DB.Where("user_id = ?", userID).Find(&devices).Error
-	if err != nil {
-		return nil, err
-	}
-	return devices, nil
-}
-
-func GetUserSchedulers(userID uint) ([]models.Scheduler, error) {
-	var schedulers []models.Scheduler
-	err := DB.Preload("Device").Where("user_id = ?", userID).Find(&schedulers).Error
-	if err != nil {
-		return nil, err
-	}
-	return schedulers, nil
 }

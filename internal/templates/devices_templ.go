@@ -49,51 +49,65 @@ func DevicesTemplate(props DevicesProps) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Devices - Brewferring</title><link rel=\"stylesheet\" href=\"/static/css/output.css\"><script src=\"/static/script/htmx.min.js\"></script></head><body class=\"bg-base-200\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = Navbar(NavbarProps{IsAuthenticated: true}).Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"container mx-auto px-4 py-8\"><div class=\"flex justify-between items-center mb-8\"><h1 class=\"text-3xl font-bold\">Devices</h1><button class=\"btn btn-primary\" onclick=\"document.getElementById(&#39;create-device-modal&#39;).showModal()\">Create Device</button></div><div class=\"overflow-x-auto\"><table class=\"table w-full\"><thead><tr><th>Name</th><th>Actions</th></tr></thead> <tbody>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		for _, device := range props.Devices {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<tr><td>")
+		templ_7745c5c3_Var2 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+			templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+			if !templ_7745c5c3_IsBuffer {
+				defer func() {
+					templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+					if templ_7745c5c3_Err == nil {
+						templ_7745c5c3_Err = templ_7745c5c3_BufErr
+					}
+				}()
+			}
+			ctx = templ.InitializeContext(ctx)
+			templ_7745c5c3_Err = Navbar().Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var2 string
-			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(device.Name)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/devices.templ`, Line: 52, Col: 25}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, " <div class=\"container mx-auto px-4 py-8\"><div class=\"flex justify-between items-center mb-8\"><h1 class=\"text-3xl font-bold\">Devices</h1><button class=\"btn btn-primary\" onclick=\"document.getElementById(&#39;create-device-modal&#39;).showModal()\">Create Device</button></div><div class=\"overflow-x-auto\"><table class=\"table w-full\"><thead><tr><th>Name</th><th>Actions</th></tr></thead> <tbody>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</td><td><button class=\"btn btn-sm btn-error\" hx-delete=\"")
+			for _, device := range props.Devices {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<tr><td>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var3 string
+				templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(device.Name)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/devices.templ`, Line: 43, Col: 25}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</td><td><button class=\"btn btn-sm btn-error\" hx-delete=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var4 string
+				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs("/devices/" + strconv.FormatInt(int64(device.ID), 10))
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/devices.templ`, Line: 45, Col: 111}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" hx-target=\"closest tr\">Delete</button></td></tr>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</tbody></table></div></div><dialog id=\"create-device-modal\" class=\"modal\"><div id=\"create-device-swap\" class=\"modal-box\"><h3 class=\"font-bold text-lg mb-4\">Create Device</h3><form id=\"create-device-form\" onsubmit=\"createDevice(event)\"><div class=\"form-control\"><label class=\"label\"><span class=\"label-text\">Name</span></label> <input type=\"text\" name=\"name\" class=\"input input-bordered\" required></div><div class=\"modal-action\"><button type=\"button\" class=\"btn btn-primary\" hx-post=\"/devices\" hx-target=\"#create-device-swap\">Create</button> <button type=\"button\" class=\"btn\" onclick=\"document.getElementById(&#39;create-device-modal&#39;).close()\">Cancel</button></div></form></div></dialog><script>\n\t\t\t\tasync function deleteDevice(id) {\n\t\t\t\t\tif (!confirm('Are you sure you want to delete this device?')) {\n\t\t\t\t\t\treturn;\n\t\t\t\t\t}\n\n\t\t\t\t\ttry {\n\t\t\t\t\t\tconst response = await fetch(`/devices/${id}`, {\n\t\t\t\t\t\t\tmethod: 'DELETE'\n\t\t\t\t\t\t});\n\n\t\t\t\t\t\tif (!response.ok) {\n\t\t\t\t\t\t\tthrow new Error('Failed to delete device');\n\t\t\t\t\t\t}\n\n\t\t\t\t\t\twindow.location.reload();\n\t\t\t\t\t} catch (error) {\n\t\t\t\t\t\talert('Failed to delete device: ' + error.message);\n\t\t\t\t\t}\n\t\t\t\t}\n\n\t\t\t\tfunction copyToClipboard(text) {\n\t\t\t\t\tnavigator.clipboard.writeText(text).then(() => {\n\t\t\t\t\t\talert('Token copied to clipboard!');\n\t\t\t\t\t}).catch(err => {\n\t\t\t\t\t\tconsole.error('Failed to copy text: ', err);\n\t\t\t\t\t});\n\t\t\t\t}\n\t\t\t</script>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var3 string
-			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs("/devices/" + strconv.FormatInt(int64(device.ID), 10))
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/devices.templ`, Line: 54, Col: 111}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" hx-target=\"closest tr\">Delete</button></td></tr>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</tbody></table></div></div><dialog id=\"create-device-modal\" class=\"modal\"><div class=\"modal-box\"><h3 class=\"font-bold text-lg mb-4\">Create Device</h3><form id=\"create-device-form\" onsubmit=\"createDevice(event)\"><div class=\"form-control\"><label class=\"label\"><span class=\"label-text\">Name</span></label> <input type=\"text\" name=\"name\" class=\"input input-bordered\" required></div><div class=\"modal-action\"><button type=\"submit\" class=\"btn btn-primary\">Create</button> <button type=\"button\" class=\"btn\" onclick=\"document.getElementById(&#39;create-device-modal&#39;).close()\">Cancel</button></div></form></div></dialog><script>\n\t\t\t\tasync function createDevice(event) {\n\t\t\t\t\tevent.preventDefault();\n\t\t\t\t\tconst form = event.target;\n\t\t\t\t\tconst formData = new FormData(form);\n\t\t\t\t\tconst data = {\n\t\t\t\t\t\tname: formData.get('name')\n\t\t\t\t\t};\n\t\t\t\t\tconsole.log(data)\n\n\t\t\t\t\ttry {\n\t\t\t\t\t\tconst response = await fetch('/devices', {\n\t\t\t\t\t\t\tmethod: 'POST',\n\t\t\t\t\t\t\theaders: {\n\t\t\t\t\t\t\t\t'Content-Type': 'application/json'\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\tbody: JSON.stringify(data)\n\t\t\t\t\t\t});\n\n\t\t\t\t\t\tif (!response.ok) {\n\t\t\t\t\t\t\tthrow new Error('Failed to create device');\n\t\t\t\t\t\t}\n\n\t\t\t\t\t\tconst result = await response.json();\n\t\t\t\t\t\talert('Device created successfully! Token: ' + result.token);\n\t\t\t\t\t\twindow.location.reload();\n\t\t\t\t\t} catch (error) {\n\t\t\t\t\t\talert('Failed to create device: ' + error.message);\n\t\t\t\t\t}\n\t\t\t\t}\n\n\t\t\t\tasync function deleteDevice(id) {\n\t\t\t\t\tif (!confirm('Are you sure you want to delete this device?')) {\n\t\t\t\t\t\treturn;\n\t\t\t\t\t}\n\n\t\t\t\t\ttry {\n\t\t\t\t\t\tconst response = await fetch(`/devices/${id}`, {\n\t\t\t\t\t\t\tmethod: 'DELETE'\n\t\t\t\t\t\t});\n\n\t\t\t\t\t\tif (!response.ok) {\n\t\t\t\t\t\t\tthrow new Error('Failed to delete device');\n\t\t\t\t\t\t}\n\n\t\t\t\t\t\twindow.location.reload();\n\t\t\t\t\t} catch (error) {\n\t\t\t\t\t\talert('Failed to delete device: ' + error.message);\n\t\t\t\t\t}\n\t\t\t\t}\n\n\t\t\t\tfunction copyToClipboard(text) {\n\t\t\t\t\tnavigator.clipboard.writeText(text).then(() => {\n\t\t\t\t\t\talert('Token copied to clipboard!');\n\t\t\t\t\t}).catch(err => {\n\t\t\t\t\t\tconsole.error('Failed to copy text: ', err);\n\t\t\t\t\t});\n\t\t\t\t}\n\t\t\t</script></body></html>")
+			return nil
+		})
+		templ_7745c5c3_Err = Base().Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

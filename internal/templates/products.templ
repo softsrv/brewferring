@@ -18,7 +18,7 @@ templ Products(products []Product) {
 			<script src="/static/script/htmx.min.js"></script>
 		</head>
 		<body class="min-h-screen bg-base-200">
-			@Navbar(NavbarProps{IsAuthenticated: true})
+			@Navbar()
 			<main class="container mx-auto px-4 py-8">
 				<h1 class="text-4xl font-bold mb-8">Our Products</h1>
 				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

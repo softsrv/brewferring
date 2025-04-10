@@ -34,7 +34,7 @@ templ SchedulersTemplate(props SchedulersProps) {
 			<script src="/static/script/htmx.min.js"></script>
 		</head>
 		<body class="bg-base-200">
-			@Navbar(NavbarProps{IsAuthenticated: true})
+			@Navbar()
 			<div class="container mx-auto px-4 py-8">
 				<div class="flex justify-between items-center mb-8">
 					<h1 class="text-3xl font-bold">Schedulers</h1>
@@ -46,7 +46,6 @@ templ SchedulersTemplate(props SchedulersProps) {
 						<thead>
 							<tr>
 								<th>Name</th>
-								<th>Type</th>
 								<th>Details</th>
 								<th>Actions</th>
 							</tr>
@@ -55,9 +54,9 @@ templ SchedulersTemplate(props SchedulersProps) {
 							for _, scheduler := range props.Schedulers {
 								<tr>
 									<td>{scheduler.Name}</td>
-									<td>{scheduler.Type}</td>
+
 									<td>
-										if scheduler.Type == "device" {
+										if scheduler.Date.IsZero(){
 											Device: {scheduler.Device.Name} (Threshold: {strconv.FormatFloat(scheduler.Threshold, 'f', 1, 64)})
 										} else {
 											Date: {scheduler.Date.Format("2006-01-02 15:04:05")}
@@ -74,7 +73,7 @@ templ SchedulersTemplate(props SchedulersProps) {
 			</div>
 
 			<dialog id="create-scheduler-modal" class="modal">
-				<div class="modal-box">
+				<div id="create-scheduler-swap" class="modal-box">
 					<h3 class="font-bold text-lg mb-4">Create Scheduler</h3>
 					<form id="create-scheduler-form" onsubmit="createScheduler(event)">
 						<div class="form-control">
@@ -115,7 +114,7 @@ templ SchedulersTemplate(props SchedulersProps) {
 							<input type="datetime-local" name="date" class="input input-bordered"/>
 						</div>
 						<div class="modal-action">
-							<button type="submit" class="btn btn-primary">Create</button>
+							<button type="button" class="btn btn-primary" hx-post="/schedulers" hx-target="#create-scheduler-swap">Create</button>
 							<button type="button" class="btn" onclick="document.getElementById('create-scheduler-modal').close()">Cancel</button>
 						</div>
 					</form>
@@ -142,36 +141,6 @@ templ SchedulersTemplate(props SchedulersProps) {
 					}
 				}
 
-				async function createScheduler(event) {
-					event.preventDefault();
-					const form = event.target;
-					const formData = new FormData(form);
-					const data = {
-						name: formData.get('name'),
-						type: formData.get('type'),
-						device_id: parseInt(formData.get('device_id')),
-						threshold: parseFloat(formData.get('threshold')),
-						date: formData.get('date')
-					};
-
-					try {
-						const response = await fetch('/api/schedulers', {
-							method: 'POST',
-							headers: {
-								'Content-Type': 'application/json'
-							},
-							body: JSON.stringify(data)
-						});
-
-						if (!response.ok) {
-							throw new Error('Failed to create scheduler');
-						}
-
-						window.location.reload();
-					} catch (error) {
-						alert('Failed to create scheduler: ' + error.message);
-					}
-				}
 
 				async function deleteScheduler(id) {
 					if (!confirm('Are you sure you want to delete this scheduler?')) {
@@ -195,4 +164,4 @@ templ SchedulersTemplate(props SchedulersProps) {
 			</script>
 		</body>
 	</html>
-} 
+}

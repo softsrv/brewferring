@@ -38,6 +38,7 @@ func main() {
 	mux.HandleFunc("/callback", h.OAuthCallback)
 
 	// Protected routes
+	mux.HandleFunc("/logout", h.Logout)
 	mux.Handle("GET /dashboard", middleware.Auth(http.HandlerFunc(h.Dashboard)))
 	mux.Handle("GET /products", middleware.Auth(http.HandlerFunc(h.Products)))
 	mux.Handle("GET /orders", middleware.Auth(http.HandlerFunc(h.Orders)))

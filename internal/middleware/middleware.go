@@ -7,20 +7,51 @@ import (
 
 	"github.com/softsrv/brewferring/internal/context"
 	"github.com/softsrv/brewferring/internal/database"
-	"github.com/softsrv/brewferring/internal/models"
+	"github.com/terminaldotshop/terminal-sdk-go"
+	"github.com/terminaldotshop/terminal-sdk-go/option"
 )
+
+// getClient returns a new Terminal.shop client initialized with the access token from context
+func getClient(token string) *terminal.Client {
+	return terminal.NewClient(option.WithBearerToken(token))
+}
+
+func GetAccessTokenFromHeader(r *http.Request) (string, error) {
+	cookie, err := r.Cookie("access_token")
+	if err != nil {
+		return "", err
+	}
+	return cookie.Value, nil
+}
 
 func Auth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		cookie, err := r.Cookie("access_token")
+		token, err := GetAccessTokenFromHeader(r)
 		if err != nil {
-			log.Println("No access token found")
-			http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 
 		// Add access token to context
-		ctx := context.WithAccessToken(r.Context(), cookie.Value)
+		ctx := context.WithAccessToken(r.Context(), token)
+		// Add terminal client to context
+		client := getClient(token)
+		ctx = context.WithTerminalClient(ctx, client)
+		// Add user to context
+		terminalUser, err := client.Profile.Me(ctx)
+		if err != nil {
+			log.Println("Unable to get terminal user")
+			http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
+			return
+		}
+		user, err := database.GetUserByTerminalID(terminalUser.Data.User.ID)
+		if err != nil {
+			log.Println("Unable to find user in DB for current session")
+			http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
+			return
+		}
+		ctx = context.WithUser(ctx, user)
+
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -38,24 +69,16 @@ func DeviceAuth(next http.Handler) http.Handler {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
-
-		token, err := database.GetDeviceToken(parts[1])
+		device, err := database.GetDeviceByToken(parts[1])
 		if err != nil {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 
 		// Check rate limiting
-		rateLimited, err := database.IsDeviceTokenRateLimited(token.ID)
+		rateLimited, err := database.CheckIsTokenLimited(device.TokenLastUsedAt)
 		if err != nil || rateLimited {
 			http.Error(w, "Rate limit exceeded", http.StatusTooManyRequests)
-			return
-		}
-
-		var device models.Device
-		err = database.DB.First(&device, token.DeviceID).Error
-		if err != nil {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 

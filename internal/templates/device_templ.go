@@ -45,7 +45,7 @@ func DeviceDetails(props DeviceDetailsProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = Navbar(NavbarProps{IsAuthenticated: true}).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Navbar().Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -62,68 +62,68 @@ func DeviceDetails(props DeviceDetailsProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</h1><div class=\"tabs tabs-boxed mb-6\"><a class=\"tab tab-active\" onclick=\"showTab(&#39;tokens&#39;)\">Tokens</a> <a class=\"tab\" onclick=\"showTab(&#39;schedulers&#39;)\">Schedulers</a> <a class=\"tab\" onclick=\"showTab(&#39;data&#39;)\">Device Data</a></div><div id=\"tokens-tab\" class=\"tab-content\"><div class=\"overflow-x-auto\"><table class=\"table w-full\"><thead><tr><th>Token</th><th>Created At</th><th>Actions</th></tr></thead> <tbody>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</h1><div class=\"tabs tabs-boxed mb-6\"><a class=\"tab\" onclick=\"showTab(&#39;schedulers&#39;)\">Schedulers</a> <a class=\"tab tab-active\" onclick=\"showTab(&#39;data&#39;)\">Device Data</a></div><div id=\"schedulers-tab\" class=\"tab-content hidden\"><div class=\"overflow-x-auto\"><table class=\"table w-full\"><thead><tr><th>Name</th><th>Date</th><th>Threshold</th><th>Action</th></tr></thead> <tbody>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		for _, token := range props.Device.Tokens {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<tr><td><div class=\"flex items-center gap-2\"><code class=\"bg-base-300 px-2 py-1 rounded\">")
+		for _, scheduler := range props.Device.Schedulers {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<tr><td>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
-			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(token.Token)
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(scheduler.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/device.templ`, Line: 51, Col: 69}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/device.templ`, Line: 49, Col: 30}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</code> <button class=\"btn btn-sm btn-ghost\" onclick=\"copyToClipboard(&#39;{ token.Token }&#39;)\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" viewBox=\"0 0 20 20\" fill=\"currentColor\"><path d=\"M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z\"></path> <path d=\"M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z\"></path></svg></button></div></td><td>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</td><td>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var4 string
-			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(token.CreatedAt.Format("2006-01-02 15:04:05"))
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(scheduler.Date.String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/device.templ`, Line: 60, Col: 61}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/device.templ`, Line: 50, Col: 39}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</td><td><button class=\"btn btn-sm btn-error\" onclick=\"revokeToken(&#39;{ token.Token }&#39;)\">Revoke</button></td></tr>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</tbody></table></div></div><div id=\"schedulers-tab\" class=\"tab-content hidden\"><div class=\"overflow-x-auto\"><table class=\"table w-full\"><thead><tr><th>Name</th><th>Date</th><th>Type</th><th>Threshold</th><th>Action</th></tr></thead> <tbody>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		for _, scheduler := range props.Device.Schedulers {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<tr><td>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</td><td>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var5 string
-			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(scheduler.Name)
+			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatFloat(scheduler.Threshold, 'f', -1, 64))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/device.templ`, Line: 86, Col: 30}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/device.templ`, Line: 51, Col: 69}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</td><td>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</td><td><button class=\"btn btn-sm btn-error\" onclick=\"deleteScheduler({ scheduler.ID })\">Delete</button></td></tr>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</tbody></table></div></div><div id=\"data-tab\" class=\"tab-content hidden\"><div class=\"overflow-x-auto\"><table class=\"table w-full\"><thead><tr><th>Timestamp</th><th>Value</th></tr></thead> <tbody>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		for _, data := range props.DeviceData {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<tr><td>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var6 string
-			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(scheduler.Date.String())
+			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(data.CreatedAt.Format("2006-01-02 15:04:05"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/device.templ`, Line: 87, Col: 39}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/device.templ`, Line: 74, Col: 60}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -134,69 +134,20 @@ func DeviceDetails(props DeviceDetailsProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var7 string
-			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(scheduler.Type)
+			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatFloat(data.Value, 'f', -1, 64))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/device.templ`, Line: 88, Col: 60}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/device.templ`, Line: 75, Col: 60}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</td><td>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var8 string
-			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatFloat(scheduler.Threshold, 'f', -1, 64))
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/device.templ`, Line: 89, Col: 99}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</td><td><button class=\"btn btn-sm btn-error\" onclick=\"deleteScheduler({ scheduler.ID })\">Delete</button></td></tr>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</td></tr>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</tbody></table></div></div><div id=\"data-tab\" class=\"tab-content hidden\"><div class=\"overflow-x-auto\"><table class=\"table w-full\"><thead><tr><th>Timestamp</th><th>Value</th></tr></thead> <tbody>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		for _, data := range props.DeviceData {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<tr><td>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var9 string
-			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(data.CreatedAt.Format("2006-01-02 15:04:05"))
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/device.templ`, Line: 112, Col: 60}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</td><td>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var10 string
-			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatFloat(data.Value, 'f', -1, 64))
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/device.templ`, Line: 113, Col: 60}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</td></tr>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</tbody></table></div></div></main><script>\n\t\t\t\tfunction showTab(tabName) {\n\t\t\t\t\t// Hide all tab contents\n\t\t\t\t\tdocument.querySelectorAll('.tab-content').forEach(content => {\n\t\t\t\t\t\tcontent.classList.add('hidden');\n\t\t\t\t\t});\n\t\t\t\t\t// Remove active class from all tabs\n\t\t\t\t\tdocument.querySelectorAll('.tab').forEach(tab => {\n\t\t\t\t\t\ttab.classList.remove('tab-active');\n\t\t\t\t\t});\n\t\t\t\t\t// Show selected tab content and activate tab\n\t\t\t\t\tdocument.getElementById(tabName + '-tab').classList.remove('hidden');\n\t\t\t\t\tevent.target.classList.add('tab-active');\n\t\t\t\t}\n\n\t\t\t\tfunction copyToClipboard(text) {\n\t\t\t\t\tnavigator.clipboard.writeText(text);\n\t\t\t\t}\n\t\t\t</script></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</tbody></table></div></div></main><script>\n\t\t\t\tfunction showTab(tabName) {\n\t\t\t\t\t// Hide all tab contents\n\t\t\t\t\tdocument.querySelectorAll('.tab-content').forEach(content => {\n\t\t\t\t\t\tcontent.classList.add('hidden');\n\t\t\t\t\t});\n\t\t\t\t\t// Remove active class from all tabs\n\t\t\t\t\tdocument.querySelectorAll('.tab').forEach(tab => {\n\t\t\t\t\t\ttab.classList.remove('tab-active');\n\t\t\t\t\t});\n\t\t\t\t\t// Show selected tab content and activate tab\n\t\t\t\t\tdocument.getElementById(tabName + '-tab').classList.remove('hidden');\n\t\t\t\t\tevent.target.classList.add('tab-active');\n\t\t\t\t}\n\n\t\t\t\tfunction copyToClipboard(text) {\n\t\t\t\t\tnavigator.clipboard.writeText(text);\n\t\t\t\t}\n\t\t\t</script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

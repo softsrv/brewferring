@@ -1,0 +1,27 @@
+package components
+import (
+  "github.com/softsrv/brewferring/internal/models"
+)
+
+templ CreateDeviceResponseComponent(device *models.Device) {
+	<h3 class="font-bold text-lg mb-4">Your Device</h3>
+	<div class="form-control">
+	<div>
+		<label class="input">
+			<span class="label">Name: </span>
+			<span>{device.Name}</span>
+		</label>
+
+		</div>
+		<div>
+		<label class="input">
+			<span class="label">Token: </span>
+			<span>{device.Token}</span>
+		</label>
+		</div>
+		<div class="info">Note: this token will not be shown again.</div>
+	</div>
+	<div class="modal-action">
+		<button type="button" class="btn btn-primary" onclick="window.location.reload()">ok</button>
+	</div>
+}
