@@ -6,7 +6,7 @@ import "github.com/softsrv/brewferring/internal/context"
 templ Navbar() {
 	<div class="navbar bg-base-100">
 		<div class="flex-1">
-			<a href="/" class="btn btn-ghost text-xl">Brewferring</a>
+			<a href="/" class="btn btn-ghost text-xl"><span class="material-icons">local_cafe</span> Buffering Brews</a>
 		</div>
 		if context.HasAccessTokenValue(ctx) {
 			<div class="flex-none gap-2">

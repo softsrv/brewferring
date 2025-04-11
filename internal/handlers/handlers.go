@@ -137,11 +137,10 @@ func (h *Handlers) Orders(w http.ResponseWriter, r *http.Request) {
 		}
 
 		templateOrders = append(templateOrders, templates.Order{
-			ID:        o.ID,
-			Status:    o.Tracking.URL,
-			Total:     float64(o.Amount.Subtotal),
-			Items:     items,
-			CreatedAt: time.Now().Format(time.RFC3339), // Since we don't have CreatedAt from the API
+			ID:     o.ID,
+			Status: o.Tracking.URL,
+			Total:  float64(o.Amount.Subtotal),
+			Items:  items,
 		})
 	}
 

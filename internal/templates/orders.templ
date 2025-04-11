@@ -7,7 +7,6 @@ type Order struct {
 	Status    string
 	Total     float64
 	Items     []OrderItem
-	CreatedAt string
 }
 
 type OrderItem struct {
@@ -29,7 +28,7 @@ templ Orders(orders []Order) {
 		<body class="min-h-screen bg-base-200">
 			@Navbar()
 			<main class="container mx-auto px-4 py-8">
-				<h1 class="text-4xl font-bold mb-8">Your Orders</h1>
+				<h1 class="text-4xl font-bold mb-8">Order History</h1>
 				<div class="overflow-x-auto">
 					<table class="table w-full">
 						<thead>
@@ -37,7 +36,6 @@ templ Orders(orders []Order) {
 								<th>Order ID</th>
 								<th>Status</th>
 								<th>Total</th>
-								<th>Created At</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -48,7 +46,6 @@ templ Orders(orders []Order) {
 										<div class="badge badge-primary">{ order.Status }</div>
 									</td>
 									<td>${ fmt.Sprintf("%.2f", order.Total) }</td>
-									<td>{ order.CreatedAt }</td>
 								</tr>
 							}
 						</tbody>
