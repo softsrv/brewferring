@@ -32,7 +32,6 @@ type Handlers struct {
 		ClientSecret  string
 		RedirectURI   string
 	}
-	config *config.Config
 }
 
 func NewHandlers(cfg *config.Config) *Handlers {
@@ -79,8 +78,14 @@ func (h *Handlers) Dashboard(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) Products(w http.ResponseWriter, r *http.Request) {
-	client := h.getClient(r)
-	products, err := client.Product.List(r.Context())
+
+	tclient, ok := ctx.GetTerminalClient(r.Context())
+	if !ok {
+		log.Printf("terminal client not found")
+		http.Error(w, "Failed to find terminal client", http.StatusInternalServerError)
+	}
+
+	products, err := tclient.Product.List(r.Context())
 	if err != nil {
 		log.Printf("products error: %s", err)
 		http.Error(w, "Failed to fetch products", http.StatusInternalServerError)
@@ -178,10 +183,6 @@ func (h *Handlers) Devices(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) CreateDevice(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
 
 	accessToken, ok := ctx.GetAccessToken(r.Context())
 	if !ok {
@@ -197,7 +198,7 @@ func (h *Handlers) CreateDevice(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := r.ParseForm(); err != nil {
-		log.Printf("unable to parse form data: %s", err)
+		log.Printf("unable to parse form data for new device: %s", err)
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
@@ -225,6 +226,7 @@ func (h *Handlers) CreateDevice(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
+
 	w.WriteHeader(http.StatusCreated)
 	component := components.CreateDeviceResponseComponent(device)
 	component.Render(r.Context(), w)
@@ -282,18 +284,23 @@ func (h *Handlers) Schedulers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accessToken, ok := ctx.GetAccessToken(r.Context())
+	_, ok := ctx.GetAccessToken(r.Context())
 	if !ok {
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 		return
 	}
 
-	// Get user from access token
-	user, err := h.getUserFromToken(accessToken)
-	if err != nil {
+	user, ok := ctx.GetUser(r.Context())
+	if !ok {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
+
+	// tclient, ok := ctx.GetTerminalClient(r.Context())
+	// if !ok {
+	// 	http.Error(w, "Internal server error", http.StatusInternalServerError)
+	// 	return
+	// }
 
 	schedulers, err := database.GetSchedulersByUserID(user.ID)
 	if err != nil {

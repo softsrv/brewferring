@@ -22,7 +22,6 @@ type Device struct {
 	Token           string `gorm:"not null"`
 	TokenLastUsedAt time.Time
 	Data            []DeviceData `gorm:"foreignKey:DeviceID"`
-	Schedulers      []Scheduler  `gorm:"foreignKey:DeviceID"`
 }
 
 type DeviceData struct {
@@ -39,7 +38,8 @@ type Scheduler struct {
 	User      User      `gorm:"foreignKey:UserID"`
 	DeviceID  uint      `gorm:"not null"`
 	Device    Device    `gorm:"foreignKey:DeviceID"`
+	ProductID string    `gorm:"not null"` // From terminal.shop
 	Threshold float64   // For device-based scheduling
 	Date      time.Time // For date-based scheduling
-	ProductID string    // From terminal.shop
+
 }

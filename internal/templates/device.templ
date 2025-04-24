@@ -8,7 +8,7 @@ import (
 
 type DeviceDetailsProps struct {
 	Device     models.Device
-	Schedulers []models.Scheduler
+	Scheduler models.Scheduler
 	DeviceData []models.DeviceData
 }
 
@@ -44,16 +44,14 @@ templ DeviceDetails(props DeviceDetailsProps) {
 								</tr>
 							</thead>
 							<tbody>
-								for _, scheduler := range props.Device.Schedulers {
 									<tr>
-										<td>{ scheduler.Name }</td>
-										<td>{ scheduler.Date.String() }</td>
-										<td>{ strconv.FormatFloat(scheduler.Threshold, 'f', -1, 64) }</td>
+										<td>{ props.Scheduler.Name }</td>
+										<td>{ props.Scheduler.Date.String() }</td>
+										<td>{ strconv.FormatFloat(props.Scheduler.Threshold, 'f', -1, 64) }</td>
 										<td>
 											<button class="btn btn-sm btn-error" onclick="deleteScheduler({ scheduler.ID })">Delete</button>
 										</td>
 									</tr>
-								}
 							</tbody>
 						</table>
 					</div>

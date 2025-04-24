@@ -17,24 +17,14 @@ func Schedulers(schedulers []models.Scheduler, devices []models.Device) templ.Co
 	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) (err error) {
 		props := SchedulersProps{
 			Schedulers: schedulers,
-			Devices:    devices,
 		}
 		return SchedulersTemplate(props).Render(ctx, w)
 	})
 }
 
 templ SchedulersTemplate(props SchedulersProps) {
-	<!DOCTYPE html>
-	<html lang="en">
-		<head>
-			<meta charset="UTF-8"/>
-			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-			<title>Schedulers - Brewferring</title>
-			<link rel="stylesheet" href="/static/css/output.css" />
-			<script src="/static/script/htmx.min.js"></script>
-		</head>
-		<body class="bg-base-200">
-			@Navbar()
+	@Base() {
+		@Navbar()
 			<div class="container mx-auto px-4 py-8">
 				<div class="flex justify-between items-center mb-8">
 					<h1 class="text-3xl font-bold">Schedulers</h1>
@@ -75,49 +65,62 @@ templ SchedulersTemplate(props SchedulersProps) {
 			<dialog id="create-scheduler-modal" class="modal">
 				<div id="create-scheduler-swap" class="modal-box">
 					<h3 class="font-bold text-lg mb-4">Create Scheduler</h3>
-					<form id="create-scheduler-form" onsubmit="createScheduler(event)">
-						<div class="form-control">
-							<label class="label">
-								<span class="label-text">Name</span>
-							</label>
-							<input type="text" name="name" class="input input-bordered" required/>
-						</div>
-						<div class="form-control">
-							<label class="label">
-								<span class="label-text">Type</span>
-							</label>
-							<select name="type" class="select select-bordered" onchange="toggleSchedulerFields(this.value)" required>
-								<option value="device">Device-based</option>
-								<option value="date">Date-based</option>
-							</select>
-						</div>
-						<div class="form-control">
-							<label class="label">
-								<span class="label-text">Device</span>
-							</label>
-							<select name="device_id" class="select select-bordered" required>
-								for _, device := range props.Devices {
-									<option value={strconv.FormatUint(uint64(device.ID), 10)}>{device.Name}</option>
-								}
-							</select>
-						</div>
-						<div class="form-control" id="threshold-field">
-							<label class="label">
-								<span class="label-text">Threshold</span>
-							</label>
-							<input type="number" name="threshold" class="input input-bordered" step="0.1" required/>
-						</div>
-						<div class="form-control hidden" id="date-field">
-							<label class="label">
-								<span class="label-text">Date</span>
-							</label>
-							<input type="datetime-local" name="date" class="input input-bordered"/>
-						</div>
-						<div class="modal-action">
-							<button type="button" class="btn btn-primary" hx-post="/schedulers" hx-target="#create-scheduler-swap">Create</button>
-							<button type="button" class="btn" onclick="document.getElementById('create-scheduler-modal').close()">Cancel</button>
-						</div>
-					</form>
+					<form id="create-scheduler-form" onsubmit="createScheduler(event)" class="space-y-4">
+  <!-- Name Field -->
+  <div class="form-control">
+    <label class="label">
+      <span class="label-text">Name</span>
+    </label>
+    <input type="text" name="name" class="input input-bordered w-full" required />
+  </div>
+
+  <!-- Type Field -->
+  <div class="form-control">
+    <label class="label">
+      <span class="label-text">Type</span>
+    </label>
+    <select name="type" class="select select-bordered w-full" onchange="toggleSchedulerFields(this.value)" required>
+      <option value="device">Device-based</option>
+      <option value="date">Date-based</option>
+    </select>
+  </div>
+
+  <!-- Device Field -->
+  <div class="form-control">
+    <label class="label">
+      <span class="label-text">Device</span>
+    </label>
+    <select name="device_id" class="select select-bordered w-full" required>
+      <!-- Example dynamic data -->
+      for _, device := range props.Devices {
+        <option value={strconv.FormatUint(uint64(device.ID), 10)}>{device.Name}</option>
+      }
+    </select>
+  </div>
+
+  <!-- Threshold Field -->
+  <div class="form-control" id="threshold-field">
+    <label class="label">
+      <span class="label-text">Threshold</span>
+    </label>
+    <input type="number" name="threshold" class="input input-bordered w-full" step="0.1" required />
+  </div>
+
+  <!-- Date Field (hidden initially) -->
+  <div class="form-control hidden" id="date-field">
+    <label class="label">
+      <span class="label-text">Date</span>
+    </label>
+    <input type="datetime-local" name="date" class="input input-bordered w-full" />
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="modal-action flex justify-between space-x-4">
+    <button type="button" class="btn btn-primary w-1/2" hx-post="/schedulers" hx-target="#create-scheduler-swap">Create</button>
+    <button type="button" class="btn w-1/2" onclick="document.getElementById('create-scheduler-modal').close()">Cancel</button>
+  </div>
+</form>
+
 				</div>
 			</dialog>
 
@@ -161,6 +164,6 @@ templ SchedulersTemplate(props SchedulersProps) {
 					}
 				}
 			</script>
-		</body>
-	</html>
+
+	}
 }

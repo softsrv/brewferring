@@ -44,7 +44,7 @@ func DeleteDevice(deviceID uint) error {
 
 func UpdateDeviceTokenLastUsedAt(device *models.Device) error {
 	now := time.Now()
-	return DB.Model(&models.User{}).Where("id = ?", device.ID).Update("token_last_used_at", now).Error
+	return DB.Model(&models.Device{}).Where("id = ?", device.ID).Update("token_last_used_at", now).Error
 }
 
 func IsDeviceTokenRateLimited(deviceID uint) (bool, error) {
@@ -76,6 +76,11 @@ func CreateScheduler(scheduler *models.Scheduler) error {
 func GetSchedulersByUserID(userID uint) ([]models.Scheduler, error) {
 	var schedulers []models.Scheduler
 	err := DB.Where("user_id = ?", userID).Find(&schedulers).Error
+	return schedulers, err
+}
+func GetSchedulersByUserIDWithDevices(userID uint) ([]models.Scheduler, error) {
+	var schedulers []models.Scheduler
+	err := DB.Where("user_id = ?", userID).Preload("Devices").Find(&schedulers).Error
 	return schedulers, err
 }
 

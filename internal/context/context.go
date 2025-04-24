@@ -29,9 +29,8 @@ func WithTerminalClient(ctx context.Context, client *terminal.Client) context.Co
 	return context.WithValue(ctx, ClientKey, client)
 }
 
-func GetAccessToken(ctx context.Context) (string, bool) {
-	token, ok := ctx.Value(AccessTokenKey).(string)
-	return token, ok
+func WithDevice(ctx context.Context, device *models.Device) context.Context {
+	return context.WithValue(ctx, DeviceKey, device)
 }
 
 func HasAccessTokenValue(ctx context.Context) bool {
@@ -39,11 +38,22 @@ func HasAccessTokenValue(ctx context.Context) bool {
 	return ok
 }
 
-func WithDevice(ctx context.Context, device *models.Device) context.Context {
-	return context.WithValue(ctx, DeviceKey, device)
+func GetAccessToken(ctx context.Context) (string, bool) {
+	token, ok := ctx.Value(AccessTokenKey).(string)
+	return token, ok
 }
 
 func GetDevice(ctx context.Context) (*models.Device, bool) {
 	device, ok := ctx.Value(DeviceKey).(*models.Device)
 	return device, ok
+}
+
+func GetTerminalClient(ctx context.Context) (*terminal.Client, bool) {
+	client, ok := ctx.Value(ClientKey).(*terminal.Client)
+	return client, ok
+}
+
+func GetUser(ctx context.Context) (*models.User, bool) {
+	user, ok := ctx.Value(UserKey).(*models.User)
+	return user, ok
 }
