@@ -101,10 +101,10 @@ func GetDeviceDataByDeviceID(deviceID uint) ([]models.DeviceData, error) {
 
 // Validation functions
 func ValidateScheduler(scheduler *models.Scheduler) error {
-	if scheduler.DeviceID != 0 && !scheduler.Date.IsZero() {
+	if scheduler.DeviceID != 0 && !time.Time(scheduler.Date).IsZero() {
 		return errors.New("scheduler cannot have both device and date")
 	}
-	if scheduler.DeviceID == 0 && scheduler.Date.IsZero() {
+	if scheduler.DeviceID == 0 && time.Time(scheduler.Date).IsZero() {
 		return errors.New("scheduler must have either device or date")
 	}
 	if scheduler.DeviceID != 0 && scheduler.Threshold == 0 {

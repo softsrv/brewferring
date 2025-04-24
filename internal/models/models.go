@@ -3,6 +3,7 @@ package models
 import (
 	"time"
 
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -33,13 +34,13 @@ type DeviceData struct {
 
 type Scheduler struct {
 	gorm.Model
-	Name      string    `gorm:"not null"`
-	UserID    uint      `gorm:"not null"`
-	User      User      `gorm:"foreignKey:UserID"`
-	DeviceID  uint      `gorm:"not null"`
-	Device    Device    `gorm:"foreignKey:DeviceID"`
-	ProductID string    `gorm:"not null"` // From terminal.shop
-	Threshold float64   // For device-based scheduling
-	Date      time.Time // For date-based scheduling
+	Name      string         `gorm:"not null"`
+	UserID    uint           `gorm:"not null"`
+	User      User           `gorm:"foreignKey:UserID"`
+	DeviceID  uint           `gorm:"not null"`
+	Device    Device         `gorm:"foreignKey:DeviceID"`
+	ProductID string         `gorm:"not null"` // From terminal.shop
+	Threshold float64        // For device-based scheduling
+	Date      datatypes.Date // For date-based scheduling
 
 }

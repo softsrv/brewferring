@@ -10,8 +10,8 @@ script CopyToClipboard(text string) {
 
 templ CreateDeviceResponseComponent(device *models.Device) {
 
-
-
+	<h3 class="font-bold text-lg mb-4">Your Device</h3>
+	<div class="form-control">
 		<div>
 			<h4 class="font-bold text-sm mb-4">{device.Name}</h4>
 		</div>
@@ -23,9 +23,10 @@ templ CreateDeviceResponseComponent(device *models.Device) {
 			</label>
 		</div>
 
-	<div><em>this token will not be shown again.</em></div>
+		<div><em>this token will not be shown again.</em></div>
 
-	<div class="modal-action">
-		<button type="button" class="btn btn-primary" onclick="window.location.reload()">ok</button>
+		<div class="modal-action">
+			<button type="button" class="btn btn-primary" onclick="window.location.reload()">ok</button>
+		</div>
 	</div>
 }

@@ -54,7 +54,7 @@ templ DevicesTemplate(props DevicesProps) {
 			<dialog id="create-device-modal" class="modal">
 				<div id="create-device-swap" class="modal-box w-fit">
 					<h3 class="font-bold text-lg mb-4">Create Device</h3>
-					<form id="create-device-form" method="POST" hx-post="/devices" hx-on::before-swap="this.reset()">
+					<form id="create-device-form" method="POST" hx-post="/devices" hx-target="#create-device-swap" hx-on::before-swap="this.reset()">
 						<div>
 							<label class="input w-fit">
 								<span class="label">Name</span>

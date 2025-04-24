@@ -2,6 +2,7 @@ package templates
 
 import (
 	"strconv"
+	"time"
 
 	"github.com/softsrv/brewferring/internal/models"
 )
@@ -46,7 +47,7 @@ templ DeviceDetails(props DeviceDetailsProps) {
 							<tbody>
 									<tr>
 										<td>{ props.Scheduler.Name }</td>
-										<td>{ props.Scheduler.Date.String() }</td>
+										<td>{ time.Time(props.Scheduler.Date).Format("2006-01-02") }</td>
 										<td>{ strconv.FormatFloat(props.Scheduler.Threshold, 'f', -1, 64) }</td>
 										<td>
 											<button class="btn btn-sm btn-error" onclick="deleteScheduler({ scheduler.ID })">Delete</button>

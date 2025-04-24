@@ -4,6 +4,7 @@ import (
 	"context"
 	"io"
 	"strconv"
+	"time"
 
 	"github.com/softsrv/brewferring/internal/models"
 )
@@ -17,6 +18,7 @@ func Schedulers(schedulers []models.Scheduler, devices []models.Device) templ.Co
 	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) (err error) {
 		props := SchedulersProps{
 			Schedulers: schedulers,
+			Devices: devices,
 		}
 		return SchedulersTemplate(props).Render(ctx, w)
 	})
@@ -46,10 +48,10 @@ templ SchedulersTemplate(props SchedulersProps) {
 									<td>{scheduler.Name}</td>
 
 									<td>
-										if scheduler.Date.IsZero(){
+										if time.Time(scheduler.Date).IsZero(){
 											Device: {scheduler.Device.Name} (Threshold: {strconv.FormatFloat(scheduler.Threshold, 'f', 1, 64)})
 										} else {
-											Date: {scheduler.Date.Format("2006-01-02 15:04:05")}
+											Date: {time.Time(scheduler.Date).Format("2006-01-02")}
 										}
 									</td>
 									<td>
@@ -86,7 +88,7 @@ templ SchedulersTemplate(props SchedulersProps) {
   </div>
 
   <!-- Device Field -->
-  <div class="form-control">
+  <div class="form-control" id="device-field">
     <label class="label">
       <span class="label-text">Device</span>
     </label>
@@ -111,7 +113,7 @@ templ SchedulersTemplate(props SchedulersProps) {
     <label class="label">
       <span class="label-text">Date</span>
     </label>
-    <input type="datetime-local" name="date" class="input input-bordered w-full" />
+    <input type="date" name="date" class="input input-bordered w-full" />
   </div>
 
   <!-- Action Buttons -->
@@ -127,17 +129,20 @@ templ SchedulersTemplate(props SchedulersProps) {
 			<script>
 				function toggleSchedulerFields(type) {
 					const thresholdField = document.getElementById('threshold-field');
+					const deviceField = document.getElementById('device-field');
 					const dateField = document.getElementById('date-field');
 					const thresholdInput = document.querySelector('input[name="threshold"]');
 					const dateInput = document.querySelector('input[name="date"]');
 
 					if (type === 'device') {
 						thresholdField.classList.remove('hidden');
+						deviceField.classList.remove('hidden');
 						dateField.classList.add('hidden');
 						thresholdInput.required = true;
 						dateInput.required = false;
 					} else {
 						thresholdField.classList.add('hidden');
+						deviceField.classList.add('hidden');
 						dateField.classList.remove('hidden');
 						thresholdInput.required = false;
 						dateInput.required = true;

@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"time"
 
+	"gorm.io/datatypes"
+
 	"github.com/softsrv/brewferring/internal/components"
 	"github.com/softsrv/brewferring/internal/config"
 	ctx "github.com/softsrv/brewferring/internal/context"
@@ -324,15 +326,8 @@ func (h *Handlers) CreateScheduler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accessToken, ok := ctx.GetAccessToken(r.Context())
+	user, ok := ctx.GetUser(r.Context())
 	if !ok {
-		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
-		return
-	}
-
-	// Get user from access token
-	user, err := h.getUserFromToken(accessToken)
-	if err != nil {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
@@ -347,6 +342,7 @@ func (h *Handlers) CreateScheduler(w http.ResponseWriter, r *http.Request) {
 	deviceID := r.FormValue("device_id")
 	threshold := r.FormValue("threshold")
 	date := r.FormValue("date")
+	sType := r.FormValue("type")
 
 	if len(name) <= 0 || len(name) > 50 {
 		log.Println("invalid device name specified")
@@ -354,43 +350,44 @@ func (h *Handlers) CreateScheduler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Check if device belongs to user
-	var device models.Device
-	if err := database.DB.First(&device, deviceID).Error; err != nil {
-		http.Error(w, "Device not found", http.StatusNotFound)
-		return
-	}
-
-	if device.UserID != user.ID {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
-
-	dID, err := strconv.ParseUint(deviceID, 10, 64)
-	if err != nil {
-		http.Error(w, "Invalid device ID provided", http.StatusBadRequest)
-		return
-	}
-	thresh, err := strconv.ParseFloat(threshold, 64)
-	if err != nil {
-		http.Error(w, "Invalid scheduler threshold provided", http.StatusBadRequest)
-		return
-	}
-
 	scheduler := &models.Scheduler{
-		Name:      name,
-		UserID:    user.ID,
-		DeviceID:  uint(dID),
-		Threshold: thresh,
+		Name:   name,
+		UserID: user.ID,
 	}
 
-	if len(date) > 0 {
-		date, err := time.Parse(time.RFC3339, date)
+	if sType == "date" {
+		sDate, err := time.Parse(time.DateOnly, date)
 		if err != nil {
-			http.Error(w, "Invalid date format", http.StatusBadRequest)
+			log.Printf("failed to create new scheduler due to invalid date: %s", err)
+			http.Error(w, "Invalid date provided", http.StatusBadRequest)
+		}
+		scheduler.Date = datatypes.Date(sDate)
+	} else {
+		// Check if device belongs to user
+		var device models.Device
+		if err := database.DB.First(&device, deviceID).Error; err != nil {
+			http.Error(w, "Device not found", http.StatusNotFound)
 			return
 		}
-		scheduler.Date = date
+
+		if device.UserID != user.ID {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		dID, err := strconv.ParseUint(deviceID, 10, 64)
+		if err != nil {
+			http.Error(w, "Invalid device ID provided", http.StatusBadRequest)
+			return
+		}
+		scheduler.DeviceID = uint(dID)
+
+		thresh, err := strconv.ParseFloat(threshold, 64)
+		if err != nil {
+			http.Error(w, "Invalid scheduler threshold provided", http.StatusBadRequest)
+			return
+		}
+		scheduler.Threshold = thresh
 	}
 
 	if err := database.CreateScheduler(scheduler); err != nil {

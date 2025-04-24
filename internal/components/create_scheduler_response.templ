@@ -2,6 +2,7 @@ package components
 import (
   "github.com/softsrv/brewferring/internal/models"
   "strconv"
+  "time"
 )
 
 templ CreateSchedulerResponseComponent(scheduler *models.Scheduler) {
@@ -20,7 +21,7 @@ templ CreateSchedulerResponseComponent(scheduler *models.Scheduler) {
 		</label>
 		</div>
     <div>
-    if scheduler.Date.IsZero() {
+    if time.Time(scheduler.Date).IsZero() {
 		<label class="input">
 			<span class="label">Threshold: </span>
 			<span>{strconv.FormatFloat(scheduler.Threshold, 'f', -1, 64)}</span>
@@ -28,7 +29,7 @@ templ CreateSchedulerResponseComponent(scheduler *models.Scheduler) {
     } else {
     <label class="input">
 			<span class="label">Date: </span>
-			<span>{scheduler.Date.String()}</span>
+			<span>{time.Time(scheduler.Date).String()}</span>
 		</label>
     }
 		</div>
