@@ -1,21 +1,11 @@
 package templates
 
 import "fmt"
+import "github.com/softsrv/brewferring/internal/provider"
 
-type Order struct {
-	ID        string
-	Status    string
-	Total     float64
-	Items     []OrderItem
-}
 
-type OrderItem struct {
-	ProductName string
-	Quantity    int
-	Price       float64
-}
 
-templ Orders(orders []Order) {
+templ Orders(orders []provider.Order) {
 	@Base() {
 		@Navbar()
 			<main class="container mx-auto px-4 py-8">
@@ -25,18 +15,18 @@ templ Orders(orders []Order) {
 						<thead>
 							<tr>
 								<th>Order ID</th>
-								<th>Status</th>
 								<th>Total</th>
+								<th>Tracking</th>
 							</tr>
 						</thead>
 						<tbody>
 							for _, order := range orders {
 								<tr>
 									<td>{ order.ID }</td>
-									<td>
-										<div class="badge badge-primary">{ order.Status }</div>
-									</td>
 									<td>${ fmt.Sprintf("%.2f", order.Total) }</td>
+									<td><a href={templ.URL(order.TrackingURL)}>{order.TrackingURL}</a></td>
+
+
 								</tr>
 							}
 						</tbody>

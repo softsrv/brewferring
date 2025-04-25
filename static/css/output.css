@@ -910,53 +910,6 @@ video {
   height: var(--size);
 }
 
-.badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: calc(0.25rem * 2);
-  border-radius: var(--radius-selector);
-  vertical-align: middle;
-  color: var(--badge-fg);
-  border: var(--border) solid var(--badge-color, var(--color-base-200));
-  font-size: 0.875rem;
-  width: -moz-fit-content;
-  width: fit-content;
-  padding-inline: calc(0.25rem * 3 - var(--border));
-  background-size: auto, calc(var(--noise) * 100%);
-  background-image: none, var(--fx-noise);
-  background-color: var(--badge-bg);
-  --badge-bg: var(--badge-color, var(--color-base-100));
-  --badge-fg: var(--color-base-content);
-  --size: calc(var(--size-selector, 0.25rem) * 6);
-  height: var(--size);
-}
-
-.badge.badge-outline {
-  --badge-fg: var(--badge-color);
-  --badge-bg: #0000;
-  background-image: none;
-}
-
-.badge.badge-dash {
-  --badge-fg: var(--badge-color);
-  --badge-bg: #0000;
-  border-style: dashed;
-  background-image: none;
-}
-
-.badge.badge-soft {
-  color: var(--badge-color, var(--color-base-content));
-  background-color: color-mix( in oklab, var(--badge-color, var(--color-base-content)) 8%, var(--color-base-100) );
-  border-color: color-mix( in oklab, var(--badge-color, var(--color-base-content)) 10%, var(--color-base-100) );
-  background-image: none;
-}
-
-.badge-primary {
-  --badge-color: var(--color-primary);
-  --badge-fg: var(--color-primary-content);
-}
-
 .input {
   cursor: text;
   border: var(--border) solid #0000;

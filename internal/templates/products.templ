@@ -1,13 +1,10 @@
 package templates
 
-type Product struct {
-	ID          string
-	Name        string
-	Description string
-	Price       float64
-}
+import "fmt"
+import "github.com/softsrv/brewferring/internal/provider"
 
-templ Products(products []Product) {
+
+templ Products(products []provider.Product) {
 	@Base() {
 		@Navbar()
 			<main class="container mx-auto px-4 py-8">
@@ -18,6 +15,7 @@ templ Products(products []Product) {
 							<div class="card-body">
 								<h2 class="card-title">{ product.Name }</h2>
 								<p>{ product.Description }</p>
+								<p>${ fmt.Sprintf("%.2f", product.Price) }</p>
 								<div class="card-actions justify-end">
 									<button class="btn btn-primary">Add to schedule</button>
 								</div>

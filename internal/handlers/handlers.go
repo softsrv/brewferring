@@ -52,15 +52,6 @@ func NewHandlers(cfg *config.Config) *Handlers {
 	return h
 }
 
-// getClient returns a new Terminal.shop client initialized with the access token from context
-func (h *Handlers) getClient(r *http.Request) *terminal.Client {
-	accessToken := ""
-	if token := r.Context().Value(ctx.AccessTokenKey); token != nil {
-		accessToken = token.(string)
-	}
-	return terminal.NewClient(option.WithBearerToken(accessToken))
-}
-
 func (h *Handlers) Home(w http.ResponseWriter, r *http.Request) {
 	token, _ := middleware.GetAccessTokenFromHeader(r)
 
@@ -81,77 +72,52 @@ func (h *Handlers) Dashboard(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handlers) Products(w http.ResponseWriter, r *http.Request) {
 
-	tclient, ok := ctx.GetTerminalClient(r.Context())
+	provider, ok := ctx.GetProvider(r.Context())
 	if !ok {
-		log.Printf("terminal client not found")
-		http.Error(w, "Failed to find terminal client", http.StatusInternalServerError)
+		log.Printf("terminal provider not found")
+		http.Error(w, "Failed to find terminal provider", http.StatusInternalServerError)
 	}
 
-	products, err := tclient.Product.List(r.Context())
+	products, err := provider.ListProducts(r.Context())
 	if err != nil {
 		log.Printf("products error: %s", err)
 		http.Error(w, "Failed to fetch products", http.StatusInternalServerError)
 		return
 	}
-
-	var templateProducts []templates.Product
-	for _, p := range products.Data {
-		templateProducts = append(templateProducts, templates.Product{
-			ID:          p.ID,
-			Name:        p.Name,
-			Description: p.Description,
-			Price:       float64(p.Variants[0].Price) / 100, // Convert cents to dollars
-		})
-	}
-
-	templates.Products(templateProducts).Render(r.Context(), w)
+	templates.Products(products).Render(r.Context(), w)
 }
 
 func (h *Handlers) Profile(w http.ResponseWriter, r *http.Request) {
-	client := h.getClient(r)
-	profile, err := client.Profile.Me(r.Context())
+	provider, ok := ctx.GetProvider(r.Context())
+	if !ok {
+		log.Printf("terminal provider not found")
+		http.Error(w, "Failed to find terminal provider", http.StatusInternalServerError)
+	}
+	profile, err := provider.GetProfile(r.Context())
 	if err != nil {
+		log.Printf("failed to fetch profile: %s", err)
 		http.Error(w, "Failed to fetch profile", http.StatusInternalServerError)
 		return
 	}
 
-	templateProfile := templates.Profile{
-		ID:    profile.Data.User.ID,
-		Email: profile.Data.User.Email,
-		Name:  profile.Data.User.Name,
-	}
-
-	templates.ProfileView(templateProfile).Render(r.Context(), w)
+	templates.ProfileView(profile).Render(r.Context(), w)
 }
 
 func (h *Handlers) Orders(w http.ResponseWriter, r *http.Request) {
-	client := h.getClient(r)
-	orders, err := client.Order.List(r.Context())
+
+	provider, ok := ctx.GetProvider(r.Context())
+	if !ok {
+		log.Printf("terminal provider not found")
+		http.Error(w, "Failed to find terminal provider", http.StatusInternalServerError)
+	}
+
+	orders, err := provider.ListOrders(r.Context())
 	if err != nil {
 		http.Error(w, "Failed to fetch orders", http.StatusInternalServerError)
 		return
 	}
 
-	var templateOrders []templates.Order
-	for _, o := range orders.Data {
-		var items []templates.OrderItem
-		for _, i := range o.Items {
-			items = append(items, templates.OrderItem{
-				ProductName: i.Description,
-				Quantity:    int(i.Quantity),
-				Price:       float64(i.Amount),
-			})
-		}
-
-		templateOrders = append(templateOrders, templates.Order{
-			ID:     o.ID,
-			Status: o.Tracking.URL,
-			Total:  float64(o.Amount.Subtotal),
-			Items:  items,
-		})
-	}
-
-	component := templates.Orders(templateOrders)
+	component := templates.Orders(orders)
 	component.Render(r.Context(), w)
 }
 
@@ -281,28 +247,12 @@ func (h *Handlers) DeleteDevice(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) Schedulers(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	_, ok := ctx.GetAccessToken(r.Context())
-	if !ok {
-		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
-		return
-	}
 
 	user, ok := ctx.GetUser(r.Context())
 	if !ok {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
-
-	// tclient, ok := ctx.GetTerminalClient(r.Context())
-	// if !ok {
-	// 	http.Error(w, "Internal server error", http.StatusInternalServerError)
-	// 	return
-	// }
 
 	schedulers, err := database.GetSchedulersByUserID(user.ID)
 	if err != nil {
@@ -321,11 +271,6 @@ func (h *Handlers) Schedulers(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) CreateScheduler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
 	user, ok := ctx.GetUser(r.Context())
 	if !ok {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)

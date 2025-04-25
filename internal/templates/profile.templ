@@ -1,12 +1,9 @@
 package templates
 
-type Profile struct {
-	ID        string
-	Email     string
-	Name      string
-}
+import "github.com/softsrv/brewferring/internal/provider"
 
-templ ProfileView(profile Profile) {
+
+templ ProfileView(profile provider.Profile) {
 	@Base() {
 		@Navbar()
 		<main class="container mx-auto px-4 py-8">

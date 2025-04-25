@@ -40,7 +40,30 @@ type Scheduler struct {
 	DeviceID  uint           `gorm:"not null"`
 	Device    Device         `gorm:"foreignKey:DeviceID"`
 	ProductID string         `gorm:"not null"` // From terminal.shop
+	CardID    string         `gorm:"not null"` // From terminal.shop
+	AddressID string         `gorm:"not null"` // From terminal.shop
 	Threshold float64        // For device-based scheduling
 	Date      datatypes.Date // For date-based scheduling
 
+}
+
+type Product struct {
+	ID          string
+	Name        string
+	Description string
+	Price       float64
+}
+
+type Address struct {
+	ID          string
+	Name        string
+	Description string
+	Price       float64
+}
+
+type Card struct {
+	ID          string
+	Name        string
+	Description string
+	Price       float64
 }

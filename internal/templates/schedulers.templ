@@ -7,11 +7,14 @@ import (
 	"time"
 
 	"github.com/softsrv/brewferring/internal/models"
+	"github.com/softsrv/brewferring/internal/provider"
 )
 
 type SchedulersProps struct {
 	Schedulers []models.Scheduler
 	Devices    []models.Device
+	Products   []provider.Product
+
 }
 
 func Schedulers(schedulers []models.Scheduler, devices []models.Device) templ.Component {

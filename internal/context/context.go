@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/softsrv/brewferring/internal/models"
+	"github.com/softsrv/brewferring/internal/provider"
 	"github.com/terminaldotshop/terminal-sdk-go"
 )
 
@@ -15,6 +16,7 @@ const (
 	UserKey        contextKey = "user_key"
 	ClientKey      contextKey = "client_key"
 	DeviceKey      contextKey = "device"
+	ProviderKey    contextKey = "provider"
 )
 
 func WithAccessToken(ctx context.Context, token string) context.Context {
@@ -27,6 +29,9 @@ func WithUser(ctx context.Context, user *models.User) context.Context {
 
 func WithTerminalClient(ctx context.Context, client *terminal.Client) context.Context {
 	return context.WithValue(ctx, ClientKey, client)
+}
+func WithProvider(ctx context.Context, provider provider.Provider) context.Context {
+	return context.WithValue(ctx, ProviderKey, provider)
 }
 
 func WithDevice(ctx context.Context, device *models.Device) context.Context {
@@ -51,6 +56,11 @@ func GetDevice(ctx context.Context) (*models.Device, bool) {
 func GetTerminalClient(ctx context.Context) (*terminal.Client, bool) {
 	client, ok := ctx.Value(ClientKey).(*terminal.Client)
 	return client, ok
+}
+
+func GetProvider(ctx context.Context) (provider.Provider, bool) {
+	provider, ok := ctx.Value(ProviderKey).(provider.Provider)
+	return provider, ok
 }
 
 func GetUser(ctx context.Context) (*models.User, bool) {

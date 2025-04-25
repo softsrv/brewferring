@@ -7,6 +7,7 @@ import (
 
 	"github.com/softsrv/brewferring/internal/context"
 	"github.com/softsrv/brewferring/internal/database"
+	"github.com/softsrv/brewferring/internal/provider"
 	"github.com/terminaldotshop/terminal-sdk-go"
 	"github.com/terminaldotshop/terminal-sdk-go/option"
 )
@@ -37,14 +38,17 @@ func Auth(next http.Handler) http.Handler {
 		// Add terminal client to context
 		client := getClient(token)
 		ctx = context.WithTerminalClient(ctx, client)
+
+		provider := provider.NewProvider(token)
+		ctx = context.WithProvider(ctx, provider)
 		// Add user to context
-		terminalUser, err := client.Profile.Me(ctx)
+		terminalUser, err := provider.GetProfile(ctx)
 		if err != nil {
 			log.Println("Unable to get terminal user")
 			http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 			return
 		}
-		user, err := database.GetUserByTerminalID(terminalUser.Data.User.ID)
+		user, err := database.GetUserByTerminalID(terminalUser.ID)
 		if err != nil {
 			log.Println("Unable to find user in DB for current session")
 			http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
