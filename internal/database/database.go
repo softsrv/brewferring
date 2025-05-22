@@ -19,7 +19,7 @@ func Init() error {
 	}
 
 	// Auto migrate the schema
-	err = DB.AutoMigrate(&models.User{}, &models.Device{}, &models.DeviceData{}, &models.Scheduler{})
+	err = DB.AutoMigrate(&models.User{}, &models.DeviceData{}, &models.Scheduler{})
 	if err != nil {
 		return err
 	}

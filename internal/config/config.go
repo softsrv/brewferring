@@ -12,6 +12,13 @@ type Config struct {
 		ClientID     string `yaml:"client_id"`
 		ClientSecret string `yaml:"client_secret"`
 		RedirectURI  string `yaml:"redirect_uri"`
+		Provider     struct {
+			Issuer        string   `yaml:"issuer"`
+			AuthEndpoint  string   `yaml:"authEndpoint"`
+			TokenEndpoint string   `yaml:"tokenEndpoint"`
+			JWKSEndpoint  string   `yaml:"JWKSEndpoint"`
+			ResponseTypes []string `yaml:"responseTypes"`
+		}
 	} `yaml:"oauth"`
 	Server struct {
 		Port int    `yaml:"port"`

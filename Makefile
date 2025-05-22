@@ -2,7 +2,7 @@ run:
 	templ generate
 	go fmt ./...
 	go vet ./...
-	tailwindcss -i ./static/css/input.css -o ./static/css/output.css
+	tailwindcss -c ./tailwind.config.js -i ./static/css/input.css -o ./static/css/output.css
 	go run main.go
 
 templ:

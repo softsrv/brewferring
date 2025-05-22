@@ -14,14 +14,9 @@ templ CreateSchedulerResponseComponent(scheduler *models.Scheduler) {
 			<span>{scheduler.Name}</span>
 		</label>
 		</div>
-		<div>
-		<label class="input">
-			<span class="label">Device Name: </span>
-			<span>{scheduler.Device.Name}</span>
-		</label>
-		</div>
+
     <div>
-    if time.Time(scheduler.Date).IsZero() {
+    if time.Time(scheduler.OrderDate).IsZero() {
 		<label class="input">
 			<span class="label">Threshold: </span>
 			<span>{strconv.FormatFloat(scheduler.Threshold, 'f', -1, 64)}</span>
@@ -29,9 +24,15 @@ templ CreateSchedulerResponseComponent(scheduler *models.Scheduler) {
     } else {
     <label class="input">
 			<span class="label">Date: </span>
-			<span>{time.Time(scheduler.Date).String()}</span>
+			<span>{time.Time(scheduler.OrderDate).String()}</span>
 		</label>
     }
+		</div>
+		<div>
+		<label class="input">
+		<span class="label">Token: </span>
+		<span>{scheduler.Token}</span>
+		</label>
 		</div>
 
 	</div>

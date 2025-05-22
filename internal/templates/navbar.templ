@@ -1,6 +1,5 @@
 package templates
 
-
 import "github.com/softsrv/brewferring/internal/context"
 
 templ Navbar() {
@@ -10,9 +9,9 @@ templ Navbar() {
 		</div>
 		if context.HasAccessTokenValue(ctx) {
 			<div class="flex-none gap-2">
+			  <a href="/about" class="btn btn-ghost">About</a>
 				<a href="/products" class="btn btn-ghost">Products</a>
 				<a href="/orders" class="btn btn-ghost">Orders</a>
-				<a href="/devices" class="btn btn-ghost">Devices</a>
 				<a href="/schedulers" class="btn btn-ghost">Schedulers</a>
 				<div class="dropdown dropdown-end">
 					<div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">

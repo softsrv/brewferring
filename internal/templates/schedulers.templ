@@ -12,16 +12,14 @@ import (
 
 type SchedulersProps struct {
 	Schedulers []models.Scheduler
-	Devices    []models.Device
 	Products   []provider.Product
 
 }
 
-func Schedulers(schedulers []models.Scheduler, devices []models.Device) templ.Component {
+func Schedulers(schedulers []models.Scheduler) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) (err error) {
 		props := SchedulersProps{
 			Schedulers: schedulers,
-			Devices: devices,
 		}
 		return SchedulersTemplate(props).Render(ctx, w)
 	})
@@ -51,14 +49,14 @@ templ SchedulersTemplate(props SchedulersProps) {
 									<td>{scheduler.Name}</td>
 
 									<td>
-										if time.Time(scheduler.Date).IsZero(){
-											Device: {scheduler.Device.Name} (Threshold: {strconv.FormatFloat(scheduler.Threshold, 'f', 1, 64)})
+										if time.Time(scheduler.OrderDate).IsZero(){
+											Threshold: {strconv.FormatFloat(scheduler.Threshold, 'f', 1, 64)}
 										} else {
-											Date: {time.Time(scheduler.Date).Format("2006-01-02")}
+											Date: {time.Time(scheduler.OrderDate).Format("2006-01-02")}
 										}
 									</td>
 									<td>
-										<button class="btn btn-sm btn-error" onclick="deleteScheduler({strconv.FormatUint(uint64(scheduler.ID), 10)})">Delete</button>
+										<button class="btn btn-sm btn-error" hx-delete={"/schedulers/" + strconv.FormatInt(int64(scheduler.ID), 10)} hx-target="closest tr">Delete</button>
 									</td>
 								</tr>
 							}
@@ -71,60 +69,47 @@ templ SchedulersTemplate(props SchedulersProps) {
 				<div id="create-scheduler-swap" class="modal-box">
 					<h3 class="font-bold text-lg mb-4">Create Scheduler</h3>
 					<form id="create-scheduler-form" onsubmit="createScheduler(event)" class="space-y-4">
-  <!-- Name Field -->
-  <div class="form-control">
-    <label class="label">
-      <span class="label-text">Name</span>
-    </label>
-    <input type="text" name="name" class="input input-bordered w-full" required />
-  </div>
+						<!-- Name Field -->
+						<div class="form-control">
+							<label class="label">
+								<span class="label-text">Name</span>
+							</label>
+							<input type="text" name="name" class="input input-bordered w-full" required />
+						</div>
 
-  <!-- Type Field -->
-  <div class="form-control">
-    <label class="label">
-      <span class="label-text">Type</span>
-    </label>
-    <select name="type" class="select select-bordered w-full" onchange="toggleSchedulerFields(this.value)" required>
-      <option value="device">Device-based</option>
-      <option value="date">Date-based</option>
-    </select>
-  </div>
+						<!-- Type Field -->
+						<div class="form-control">
+							<label class="label">
+								<span class="label-text">Type</span>
+							</label>
+							<select name="type" class="select select-bordered w-full" onchange="toggleSchedulerFields(this.value)" required>
+								<option value="device">Device-based</option>
+								<option value="date">Date-based</option>
+							</select>
+						</div>
 
-  <!-- Device Field -->
-  <div class="form-control" id="device-field">
-    <label class="label">
-      <span class="label-text">Device</span>
-    </label>
-    <select name="device_id" class="select select-bordered w-full" required>
-      <!-- Example dynamic data -->
-      for _, device := range props.Devices {
-        <option value={strconv.FormatUint(uint64(device.ID), 10)}>{device.Name}</option>
-      }
-    </select>
-  </div>
+						<!-- Threshold Field -->
+						<div class="form-control" id="threshold-field">
+							<label class="label">
+								<span class="label-text">Threshold</span>
+							</label>
+							<input type="number" name="threshold" class="input input-bordered w-full" step="0.1" required />
+						</div>
 
-  <!-- Threshold Field -->
-  <div class="form-control" id="threshold-field">
-    <label class="label">
-      <span class="label-text">Threshold</span>
-    </label>
-    <input type="number" name="threshold" class="input input-bordered w-full" step="0.1" required />
-  </div>
+						<!-- Date Field (hidden initially) -->
+						<div class="form-control hidden" id="date-field">
+							<label class="label">
+								<span class="label-text">Date</span>
+							</label>
+							<input type="date" name="date" class="input input-bordered w-full" />
+						</div>
 
-  <!-- Date Field (hidden initially) -->
-  <div class="form-control hidden" id="date-field">
-    <label class="label">
-      <span class="label-text">Date</span>
-    </label>
-    <input type="date" name="date" class="input input-bordered w-full" />
-  </div>
-
-  <!-- Action Buttons -->
-  <div class="modal-action flex justify-between space-x-4">
-    <button type="button" class="btn btn-primary w-1/2" hx-post="/schedulers" hx-target="#create-scheduler-swap">Create</button>
-    <button type="button" class="btn w-1/2" onclick="document.getElementById('create-scheduler-modal').close()">Cancel</button>
-  </div>
-</form>
+						<!-- Action Buttons -->
+						<div class="modal-action flex justify-between space-x-4">
+							<button type="button" class="btn btn-primary w-1/2" hx-post="/schedulers" hx-target="#create-scheduler-swap">Create</button>
+							<button type="button" class="btn w-1/2" onclick="document.getElementById('create-scheduler-modal').close()">Cancel</button>
+						</div>
+					</form>
 
 				</div>
 			</dialog>
@@ -132,20 +117,17 @@ templ SchedulersTemplate(props SchedulersProps) {
 			<script>
 				function toggleSchedulerFields(type) {
 					const thresholdField = document.getElementById('threshold-field');
-					const deviceField = document.getElementById('device-field');
 					const dateField = document.getElementById('date-field');
 					const thresholdInput = document.querySelector('input[name="threshold"]');
 					const dateInput = document.querySelector('input[name="date"]');
 
 					if (type === 'device') {
 						thresholdField.classList.remove('hidden');
-						deviceField.classList.remove('hidden');
 						dateField.classList.add('hidden');
 						thresholdInput.required = true;
 						dateInput.required = false;
 					} else {
 						thresholdField.classList.add('hidden');
-						deviceField.classList.add('hidden');
 						dateField.classList.remove('hidden');
 						thresholdInput.required = false;
 						dateInput.required = true;

@@ -48,7 +48,7 @@ func Orders(orders []provider.Order) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, " <main class=\"container mx-auto px-4 py-8\"><h1 class=\"text-4xl font-bold mb-8\">Order History</h1><div class=\"overflow-x-auto\"><table class=\"table w-full\"><thead><tr><th>Order ID</th><th>Total</th><th>Tracking</th></tr></thead> <tbody>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, " <div class=\"container mx-auto px-4 py-8\"><h1 class=\"text-4xl font-bold mb-8\">Order History</h1><div class=\"overflow-x-auto\"><table class=\"table w-full\"><thead><tr><th>Order ID</th><th>Total</th><th>Tracking</th></tr></thead> <tbody>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -106,7 +106,7 @@ func Orders(orders []provider.Order) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</tbody></table></div></main>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</tbody></table></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

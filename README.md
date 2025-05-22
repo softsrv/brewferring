@@ -7,7 +7,6 @@ A web application for ordering coffee through the Terminal.shop API.
 - Browse coffee products
 - User authentication via Terminal.shop OAuth
 - View and manage orders
-- Modern UI with Tailwind CSS and DaisyUI
 
 ## Development
 

@@ -23,3 +23,7 @@ vendor
 # OS specific
 .DS_Store
 Thumbs.db
+
+
+# generated css
+output.css

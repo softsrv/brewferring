@@ -29,7 +29,8 @@ func Auth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token, err := GetAccessTokenFromHeader(r)
 		if err != nil {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			log.Println("No authorization present")
+			http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 			return
 		}
 
@@ -73,21 +74,21 @@ func DeviceAuth(next http.Handler) http.Handler {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
-		device, err := database.GetDeviceByToken(parts[1])
+		scheduler, err := database.GetSchedulerByToken(parts[1])
 		if err != nil {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 
 		// Check rate limiting
-		rateLimited, err := database.CheckIsTokenLimited(device.TokenLastUsedAt)
+		rateLimited, err := database.CheckIsTokenLimited(scheduler.TokenLastUsedAt)
 		if err != nil || rateLimited {
 			http.Error(w, "Rate limit exceeded", http.StatusTooManyRequests)
 			return
 		}
 
-		// Add device to context
-		ctx := context.WithDevice(r.Context(), &device)
+		// Add scheduler to context
+		ctx := context.WithScheduler(r.Context(), &scheduler)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

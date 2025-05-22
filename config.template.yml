@@ -2,7 +2,15 @@ oauth:
   client_id: "your_client_id_here"
   client_secret: "your_client_secret_here"
   redirect_uri: "http://localhost:8080/callback"
+  provider:
+    issuer: ""
+    authEndpoint: ""
+    tokenEndpoint: ""
+    JWKSEndpoint: ""
+    responseTypes:
+      - "type1"
+      - "type2"
 
 server:
   port: 3000
-  host: "localhost" 
+  host: "localhost"

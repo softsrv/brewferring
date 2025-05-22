@@ -7,8 +7,10 @@ import "github.com/softsrv/brewferring/internal/provider"
 templ Products(products []provider.Product) {
 	@Base() {
 		@Navbar()
-			<main class="container mx-auto px-4 py-8">
-				<h1 class="text-3xl font-bold mb-8">Products - Served by terminal.shop</h1>
+<div class="container mx-auto px-4 py-8">
+				<h1>Available Products</h1>
+				<h2>Served by terminal.shop <a target="_blank" href="https://terminal.shop"><span class="material-symbols-outlined">open_in_new</span></a></h2>
+
 				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 					for _, product := range products {
 						<div class="card bg-base-100 shadow-xl">
@@ -17,12 +19,12 @@ templ Products(products []provider.Product) {
 								<p>{ product.Description }</p>
 								<p>${ fmt.Sprintf("%.2f", product.Price) }</p>
 								<div class="card-actions justify-end">
-									<button class="btn btn-primary">Add to schedule</button>
+									<button class="btn btn-primary">Buffer this brew!</button>
 								</div>
 							</div>
 						</div>
 					}
 				</div>
-			</main>
+</div>
 	}
 }

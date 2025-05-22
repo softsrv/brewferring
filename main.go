@@ -36,18 +36,13 @@ func main() {
 	mux.HandleFunc("/", h.Home)
 	mux.HandleFunc("/login", h.Login)
 	mux.HandleFunc("/callback", h.OAuthCallback)
+	mux.HandleFunc("/logout", h.Logout)
+	mux.HandleFunc("/about", h.About)
 
 	// Protected routes
-	mux.HandleFunc("/logout", h.Logout)
-	mux.Handle("GET /dashboard", middleware.Auth(http.HandlerFunc(h.Dashboard)))
 	mux.Handle("GET /products", middleware.Auth(http.HandlerFunc(h.Products)))
 	mux.Handle("GET /orders", middleware.Auth(http.HandlerFunc(h.Orders)))
 	mux.Handle("GET /profile", middleware.Auth(http.HandlerFunc(h.Profile)))
-
-	// devices
-	mux.Handle("GET /devices", middleware.Auth(http.HandlerFunc(h.Devices)))
-	mux.Handle("POST /devices", middleware.Auth(http.HandlerFunc(h.CreateDevice)))
-	mux.Handle("DELETE /devices/{id}", middleware.Auth(http.HandlerFunc(h.DeleteDevice)))
 
 	// schedulers
 	mux.Handle("GET /schedulers", middleware.Auth(http.HandlerFunc(h.Schedulers)))
@@ -55,7 +50,7 @@ func main() {
 	mux.Handle("DELETE /schedulers/{id}", middleware.Auth(http.HandlerFunc(h.DeleteScheduler)))
 
 	// API routes
-	mux.Handle("/api/devices/data", middleware.DeviceAuth(http.HandlerFunc(h.CreateDeviceData)))
+	mux.Handle("POST /api/devices/data", middleware.DeviceAuth(http.HandlerFunc(h.CreateDeviceData)))
 
 	// Start server
 	log.Println("Starting server on", cfg.Server.Port)
