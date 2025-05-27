@@ -29,7 +29,7 @@ func Base() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\" data-theme=\"synthwave\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Buffering Brews</title><link rel=\"stylesheet\" href=\"/static/css/output.css\"><link href=\"https://fonts.googleapis.com/icon?family=Material+Icons\" rel=\"stylesheet\"><link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&amp;icon_names=open_in_new\"><script src=\"/static/script/htmx.min.js\"></script></head><body class=\"flex flex-col min-h-screen bg-base-200\"><main class=\"flex-grow\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html data-theme=\"dim\" lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Buffering Brews</title><link rel=\"stylesheet\" href=\"/static/css/output.css\"><link href=\"https://fonts.googleapis.com/icon?family=Material+Icons\" rel=\"stylesheet\"><link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&amp;icon_names=open_in_new\"><script src=\"/static/script/htmx.min.js\"></script></head><body class=\"flex flex-col min-h-screen bg-base-200\"><main class=\"flex-grow\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -37,7 +37,7 @@ func Base() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</main><footer class=\"text-xs text-center py-4\">not affiliated with or endorsed by <a target=\"_blank\" href=\"https://www.terminal.shop\">terminal.shop</a></footer></body><script>\n\t\t\tfunction copyToClipboard(text) {\n\t\t\t\tnavigator.clipboard.writeText(text);\n\t\t\t}\n\t\t</script></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</main><footer class=\"text-xs text-center py-4\">not affiliated with or endorsed by <a target=\"_blank\" href=\"https://www.terminal.shop\">terminal.shop</a></footer></body><script>\n\t\tfunction copyToClipboard(text) {\n\t\t\tnavigator.clipboard.writeText(text);\n\t\t}\n\t</script></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

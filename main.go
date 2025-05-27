@@ -1,6 +1,7 @@
 package main
 
 import (
+	"embed"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,6 +11,11 @@ import (
 	"github.com/softsrv/brewferring/internal/handlers"
 	"github.com/softsrv/brewferring/internal/middleware"
 )
+
+// content holds our static web server content.
+//
+//go:embed static/*
+var content embed.FS
 
 func main() {
 	// Load configuration
@@ -30,7 +36,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	// Static files
-	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	mux.Handle("/static/", http.FileServer(http.FS(content)))
 
 	// Public routes
 	mux.HandleFunc("/", h.Home)

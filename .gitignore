@@ -5,6 +5,9 @@ node_modules
 vendor
 *.db
 
+# binaries
+bin/
+
 # Go specific
 *.exe
 *.exe~

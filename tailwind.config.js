@@ -1,3 +1,4 @@
+/** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./internal/**/*.{go,js,templ,html}"],
   theme: {
@@ -5,6 +6,6 @@ module.exports = {
   },
   plugins: [require("daisyui")],
   daisyui: {
-    themes: ["synthwave --default", "dark"]
+    themes: ["synthwave"]
   }
 };
