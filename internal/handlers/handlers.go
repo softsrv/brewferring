@@ -110,7 +110,7 @@ func (h *Handlers) Orders(w http.ResponseWriter, r *http.Request) {
 	component.Render(r.Context(), w)
 }
 
-func (h *Handlers) Schedulers(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) Buffers(w http.ResponseWriter, r *http.Request) {
 
 	user, ok := ctx.GetUser(r.Context())
 	if !ok {
@@ -118,17 +118,17 @@ func (h *Handlers) Schedulers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	schedulers, err := database.GetSchedulersByUserID(user.ID)
+	buffers, err := database.GetBuffersByUserID(user.ID)
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 
-	component := templates.Schedulers(schedulers)
+	component := templates.Buffers(buffers)
 	component.Render(r.Context(), w)
 }
 
-func (h *Handlers) CreateScheduler(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) CreateBuffer(w http.ResponseWriter, r *http.Request) {
 	user, ok := ctx.GetUser(r.Context())
 	if !ok {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
@@ -158,7 +158,7 @@ func (h *Handlers) CreateScheduler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	scheduler := &models.Scheduler{
+	buffer := &models.Buffer{
 		Name:   name,
 		UserID: user.ID,
 		Token:  token,
@@ -167,32 +167,32 @@ func (h *Handlers) CreateScheduler(w http.ResponseWriter, r *http.Request) {
 	if sType == "date" {
 		sDate, err := time.Parse(time.DateOnly, date)
 		if err != nil {
-			log.Printf("failed to create new scheduler due to invalid date: %s", err)
+			log.Printf("failed to create new buffer due to invalid date: %s", err)
 			http.Error(w, "Invalid date provided", http.StatusBadRequest)
 		}
-		scheduler.OrderDate = datatypes.Date(sDate)
+		buffer.OrderDate = datatypes.Date(sDate)
 	} else {
 		// Check if device belongs to user
 
 		thresh, err := strconv.ParseFloat(threshold, 64)
 		if err != nil {
-			http.Error(w, "Invalid scheduler threshold provided", http.StatusBadRequest)
+			http.Error(w, "Invalid buffer threshold provided", http.StatusBadRequest)
 			return
 		}
-		scheduler.Threshold = thresh
+		buffer.Threshold = thresh
 	}
 
-	if err := database.CreateScheduler(scheduler); err != nil {
+	if err := database.CreateBuffer(buffer); err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	component := components.CreateSchedulerResponseComponent(scheduler)
+	component := components.CreateBufferResponseComponent(buffer)
 	component.Render(r.Context(), w)
 }
 
-func (h *Handlers) DeleteScheduler(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) DeleteBuffer(w http.ResponseWriter, r *http.Request) {
 	user, ok := ctx.GetUser(r.Context())
 	if !ok {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
@@ -200,25 +200,25 @@ func (h *Handlers) DeleteScheduler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id := r.PathValue("id")
-	schedulerID, err := strconv.ParseUint(id, 10, 32)
+	bufferID, err := strconv.ParseUint(id, 10, 32)
 	if err != nil {
-		http.Error(w, "Invalid scheduler ID", http.StatusBadRequest)
+		http.Error(w, "Invalid buffer ID", http.StatusBadRequest)
 		return
 	}
 
-	// Check if scheduler belongs to user
-	var scheduler models.Scheduler
-	if err := database.DB.First(&scheduler, schedulerID).Error; err != nil {
-		http.Error(w, "Scheduler not found", http.StatusNotFound)
+	// Check if buffer belongs to user
+	var buffer models.Buffer
+	if err := database.DB.First(&buffer, bufferID).Error; err != nil {
+		http.Error(w, "Buffer not found", http.StatusNotFound)
 		return
 	}
 
-	if scheduler.UserID != user.ID {
+	if buffer.UserID != user.ID {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 
-	if err := database.DeleteScheduler(scheduler.ID); err != nil {
+	if err := database.DeleteBuffer(buffer.ID); err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
@@ -349,26 +349,26 @@ func (h *Handlers) GetDeviceData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	schedulerID, err := strconv.ParseUint(r.URL.Query().Get("scheduler_id"), 10, 32)
+	bufferID, err := strconv.ParseUint(r.URL.Query().Get("buffer_id"), 10, 32)
 	if err != nil {
 		http.Error(w, "Invalid device ID", http.StatusBadRequest)
 		return
 	}
 
-	// Get the scheduler to check ownership
-	var scheduler models.Scheduler
-	if err := database.DB.Preload("User").First(&scheduler, schedulerID).Error; err != nil {
+	// Get the buffer to check ownership
+	var buffer models.Buffer
+	if err := database.DB.Preload("User").First(&buffer, bufferID).Error; err != nil {
 		http.Error(w, "Device not found", http.StatusNotFound)
 		return
 	}
 
-	if scheduler.UserID != user.ID {
+	if buffer.UserID != user.ID {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 
 	// Get device data
-	data, err := database.GetDeviceDataBySchedulerID(uint(schedulerID))
+	data, err := database.GetDeviceDataByBufferID(uint(bufferID))
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
@@ -380,9 +380,9 @@ func (h *Handlers) GetDeviceData(w http.ResponseWriter, r *http.Request) {
 
 // CreateDeviceData creates new device data from an authenticated device
 func (h *Handlers) CreateDeviceData(w http.ResponseWriter, r *http.Request) {
-	scheduler, ok := ctx.GetScheduler(r.Context())
+	buffer, ok := ctx.GetBuffer(r.Context())
 	if !ok {
-		http.Error(w, "No scheduler found", http.StatusNotFound)
+		http.Error(w, "No buffer found", http.StatusNotFound)
 		return
 	}
 
@@ -397,8 +397,8 @@ func (h *Handlers) CreateDeviceData(w http.ResponseWriter, r *http.Request) {
 
 	// Create device data
 	data := &models.DeviceData{
-		SchedulerID: scheduler.ID,
-		Value:       req.Value,
+		BufferID: buffer.ID,
+		Value:    req.Value,
 	}
 
 	if err := database.CreateDeviceData(data); err != nil {
@@ -407,7 +407,7 @@ func (h *Handlers) CreateDeviceData(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Update last used timestamp
-	if err := database.UpdateSchedulerTokenLastUsedAt(scheduler); err != nil {
+	if err := database.UpdateBufferTokenLastUsedAt(buffer); err != nil {
 		log.Printf("Failed to update device token last used at: %v", err)
 	}
 

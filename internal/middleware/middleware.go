@@ -74,21 +74,21 @@ func DeviceAuth(next http.Handler) http.Handler {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
-		scheduler, err := database.GetSchedulerByToken(parts[1])
+		buffer, err := database.GetBufferByToken(parts[1])
 		if err != nil {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 
 		// Check rate limiting
-		rateLimited, err := database.CheckIsTokenLimited(scheduler.TokenLastUsedAt)
+		rateLimited, err := database.CheckIsTokenLimited(buffer.TokenLastUsedAt)
 		if err != nil || rateLimited {
 			http.Error(w, "Rate limit exceeded", http.StatusTooManyRequests)
 			return
 		}
 
-		// Add scheduler to context
-		ctx := context.WithScheduler(r.Context(), &scheduler)
+		// Add buffer to context
+		ctx := context.WithBuffer(r.Context(), &buffer)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

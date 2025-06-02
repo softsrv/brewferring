@@ -10,28 +10,28 @@ import (
 	"github.com/softsrv/brewferring/internal/provider"
 )
 
-type SchedulersProps struct {
-	Schedulers []models.Scheduler
+type BuffersProps struct {
+	Buffers []models.Buffer
 	Products   []provider.Product
 
 }
 
-func Schedulers(schedulers []models.Scheduler) templ.Component {
+func Buffers(buffers []models.Buffer) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, w io.Writer) (err error) {
-		props := SchedulersProps{
-			Schedulers: schedulers,
+		props := BuffersProps{
+			Buffers: buffers,
 		}
-		return SchedulersTemplate(props).Render(ctx, w)
+		return BuffersTemplate(props).Render(ctx, w)
 	})
 }
 
-templ SchedulersTemplate(props SchedulersProps) {
+templ BuffersTemplate(props BuffersProps) {
 	@Base() {
 		@Navbar()
 			<div class="container mx-auto px-4 py-8">
 				<div class="flex justify-between items-center mb-8">
-					<h1 class="text-3xl font-bold">Schedulers</h1>
-					<button class="btn btn-primary" onclick="document.getElementById('create-scheduler-modal').showModal()">Create Scheduler</button>
+					<h1 class="text-3xl font-bold">Buffers</h1>
+					<button class="btn btn-primary" onclick="document.getElementById('create-buffer-modal').showModal()">Create Buffer</button>
 				</div>
 
 				<div class="overflow-x-auto">
@@ -44,19 +44,19 @@ templ SchedulersTemplate(props SchedulersProps) {
 							</tr>
 						</thead>
 						<tbody>
-							for _, scheduler := range props.Schedulers {
+							for _, buffer := range props.Buffers {
 								<tr>
-									<td>{scheduler.Name}</td>
+									<td>{buffer.Name}</td>
 
 									<td>
-										if time.Time(scheduler.OrderDate).IsZero(){
-											Threshold: {strconv.FormatFloat(scheduler.Threshold, 'f', 1, 64)}
+										if time.Time(buffer.OrderDate).IsZero(){
+											Threshold: {strconv.FormatFloat(buffer.Threshold, 'f', 1, 64)}
 										} else {
-											Date: {time.Time(scheduler.OrderDate).Format("2006-01-02")}
+											Date: {time.Time(buffer.OrderDate).Format("2006-01-02")}
 										}
 									</td>
 									<td>
-										<button class="btn btn-sm btn-error" hx-delete={"/schedulers/" + strconv.FormatInt(int64(scheduler.ID), 10)} hx-target="closest tr">Delete</button>
+										<button class="btn btn-sm btn-error" hx-delete={"/buffers/" + strconv.FormatInt(int64(buffer.ID), 10)} hx-target="closest tr">Delete</button>
 									</td>
 								</tr>
 							}
@@ -65,10 +65,10 @@ templ SchedulersTemplate(props SchedulersProps) {
 				</div>
 			</div>
 
-			<dialog id="create-scheduler-modal" class="modal">
-				<div id="create-scheduler-swap" class="modal-box">
-					<h3 class="font-bold text-lg mb-4">Create Scheduler</h3>
-					<form id="create-scheduler-form" onsubmit="createScheduler(event)" class="space-y-4">
+			<dialog id="create-buffer-modal" class="modal">
+				<div id="create-buffer-swap" class="modal-box">
+					<h3 class="font-bold text-lg mb-4">Create Buffer</h3>
+					<form id="create-buffer-form" onsubmit="createBuffer(event)" class="space-y-4">
 						<!-- Name Field -->
 						<div class="form-control">
 							<label class="label">
@@ -82,7 +82,7 @@ templ SchedulersTemplate(props SchedulersProps) {
 							<label class="label">
 								<span class="label-text">Type</span>
 							</label>
-							<select name="type" class="select select-bordered w-full" onchange="toggleSchedulerFields(this.value)" required>
+							<select name="type" class="select select-bordered w-full" onchange="toggleBufferFields(this.value)" required>
 								<option value="device">Device-based</option>
 								<option value="date">Date-based</option>
 							</select>
@@ -106,8 +106,8 @@ templ SchedulersTemplate(props SchedulersProps) {
 
 						<!-- Action Buttons -->
 						<div class="modal-action flex justify-between space-x-4">
-							<button type="button" class="btn btn-primary w-1/2" hx-post="/schedulers" hx-target="#create-scheduler-swap">Create</button>
-							<button type="button" class="btn w-1/2" onclick="document.getElementById('create-scheduler-modal').close()">Cancel</button>
+							<button type="button" class="btn btn-primary w-1/2" hx-post="/buffers" hx-target="#create-buffer-swap">Create</button>
+							<button type="button" class="btn w-1/2" onclick="document.getElementById('create-buffer-modal').close()">Cancel</button>
 						</div>
 					</form>
 
@@ -115,7 +115,7 @@ templ SchedulersTemplate(props SchedulersProps) {
 			</dialog>
 
 			<script>
-				function toggleSchedulerFields(type) {
+				function toggleBufferFields(type) {
 					const thresholdField = document.getElementById('threshold-field');
 					const dateField = document.getElementById('date-field');
 					const thresholdInput = document.querySelector('input[name="threshold"]');
@@ -134,23 +134,23 @@ templ SchedulersTemplate(props SchedulersProps) {
 					}
 				}
 
-				async function deleteScheduler(id) {
-					if (!confirm('Are you sure you want to delete this scheduler?')) {
+				async function deleteBuffer(id) {
+					if (!confirm('Are you sure you want to delete this buffer?')) {
 						return;
 					}
 
 					try {
-						const response = await fetch(`/api/schedulers?id=${id}`, {
+						const response = await fetch(`/api/buffers?id=${id}`, {
 							method: 'DELETE'
 						});
 
 						if (!response.ok) {
-							throw new Error('Failed to delete scheduler');
+							throw new Error('Failed to delete buffer');
 						}
 
 						window.location.reload();
 					} catch (error) {
-						alert('Failed to delete scheduler: ' + error.message);
+						alert('Failed to delete buffer: ' + error.message);
 					}
 				}
 			</script>

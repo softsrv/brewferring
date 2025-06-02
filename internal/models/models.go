@@ -9,19 +9,19 @@ import (
 
 type User struct {
 	gorm.Model
-	TerminalID string      `gorm:"uniqueIndex;not null"`
-	Email      string      `gorm:"uniqueIndex;not null"`
-	Schedulers []Scheduler `gorm:"foreignKey:UserID"`
+	TerminalID string   `gorm:"uniqueIndex;not null"`
+	Email      string   `gorm:"uniqueIndex;not null"`
+	Buffers    []Buffer `gorm:"foreignKey:UserID"`
 }
 
 type DeviceData struct {
 	gorm.Model
-	SchedulerID uint      `gorm:"not null"`
-	Scheduler   Scheduler `gorm:"foreignKey:SchedulerID"`
-	Value       float64   `gorm:"not null"`
+	BufferID uint    `gorm:"not null"`
+	Buffer   Buffer  `gorm:"foreignKey:BufferID"`
+	Value    float64 `gorm:"not null"`
 }
 
-type Scheduler struct {
+type Buffer struct {
 	gorm.Model
 	Name            string         `gorm:"not null"`
 	UserID          uint           `gorm:"not null"`

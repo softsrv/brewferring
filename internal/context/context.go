@@ -15,7 +15,7 @@ const (
 	AccessTokenKey contextKey = "access_token"
 	UserKey        contextKey = "user_key"
 	ClientKey      contextKey = "client_key"
-	SchedulerKey   contextKey = "scheduler"
+	BufferKey      contextKey = "buffer"
 	ProviderKey    contextKey = "provider"
 )
 
@@ -27,8 +27,8 @@ func WithUser(ctx context.Context, user *models.User) context.Context {
 	return context.WithValue(ctx, UserKey, user)
 }
 
-func WithScheduler(ctx context.Context, scheduler *models.Scheduler) context.Context {
-	return context.WithValue(ctx, SchedulerKey, scheduler)
+func WithBuffer(ctx context.Context, buffer *models.Buffer) context.Context {
+	return context.WithValue(ctx, BufferKey, buffer)
 }
 
 func WithTerminalClient(ctx context.Context, client *terminal.Client) context.Context {
@@ -62,7 +62,7 @@ func GetUser(ctx context.Context) (*models.User, bool) {
 	user, ok := ctx.Value(UserKey).(*models.User)
 	return user, ok
 }
-func GetScheduler(ctx context.Context) (*models.Scheduler, bool) {
-	scheduler, ok := ctx.Value(SchedulerKey).(*models.Scheduler)
-	return scheduler, ok
+func GetBuffer(ctx context.Context) (*models.Buffer, bool) {
+	buffer, ok := ctx.Value(BufferKey).(*models.Buffer)
+	return buffer, ok
 }

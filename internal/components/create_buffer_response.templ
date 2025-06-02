@@ -5,33 +5,33 @@ import (
   "time"
 )
 
-templ CreateSchedulerResponseComponent(scheduler *models.Scheduler) {
-	<h3 class="font-bold text-lg mb-4">Your Scheduler</h3>
+templ CreateBufferResponseComponent(buffer *models.Buffer) {
+	<h3 class="font-bold text-lg mb-4">Your Buffer</h3>
 	<div class="form-control">
 	<div>
 		<label class="input">
 			<span class="label">Name: </span>
-			<span>{scheduler.Name}</span>
+			<span>{buffer.Name}</span>
 		</label>
 		</div>
 
     <div>
-    if time.Time(scheduler.OrderDate).IsZero() {
+    if time.Time(buffer.OrderDate).IsZero() {
 		<label class="input">
 			<span class="label">Threshold: </span>
-			<span>{strconv.FormatFloat(scheduler.Threshold, 'f', -1, 64)}</span>
+			<span>{strconv.FormatFloat(buffer.Threshold, 'f', -1, 64)}</span>
 		</label>
     } else {
     <label class="input">
 			<span class="label">Date: </span>
-			<span>{time.Time(scheduler.OrderDate).String()}</span>
+			<span>{time.Time(buffer.OrderDate).String()}</span>
 		</label>
     }
 		</div>
 		<div>
 		<label class="input">
 		<span class="label">Token: </span>
-		<span>{scheduler.Token}</span>
+		<span>{buffer.Token}</span>
 		</label>
 		</div>
 

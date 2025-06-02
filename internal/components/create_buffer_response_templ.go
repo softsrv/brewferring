@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-func CreateSchedulerResponseComponent(scheduler *models.Scheduler) templ.Component {
+func CreateBufferResponseComponent(buffer *models.Buffer) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -35,14 +35,14 @@ func CreateSchedulerResponseComponent(scheduler *models.Scheduler) templ.Compone
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<h3 class=\"font-bold text-lg mb-4\">Your Scheduler</h3><div class=\"form-control\"><div><label class=\"input\"><span class=\"label\">Name: </span> <span>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<h3 class=\"font-bold text-lg mb-4\">Your Buffer</h3><div class=\"form-control\"><div><label class=\"input\"><span class=\"label\">Name: </span> <span>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
-		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(scheduler.Name)
+		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(buffer.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/create_scheduler_response.templ`, Line: 14, Col: 24}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/create_buffer_response.templ`, Line: 14, Col: 21}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -52,15 +52,15 @@ func CreateSchedulerResponseComponent(scheduler *models.Scheduler) templ.Compone
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if time.Time(scheduler.OrderDate).IsZero() {
+		if time.Time(buffer.OrderDate).IsZero() {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<label class=\"input\"><span class=\"label\">Threshold: </span> <span>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
-			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatFloat(scheduler.Threshold, 'f', -1, 64))
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.FormatFloat(buffer.Threshold, 'f', -1, 64))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/create_scheduler_response.templ`, Line: 22, Col: 63}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/create_buffer_response.templ`, Line: 22, Col: 60}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -76,9 +76,9 @@ func CreateSchedulerResponseComponent(scheduler *models.Scheduler) templ.Compone
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var4 string
-			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(time.Time(scheduler.OrderDate).String())
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(time.Time(buffer.OrderDate).String())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/create_scheduler_response.templ`, Line: 27, Col: 49}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/create_buffer_response.templ`, Line: 27, Col: 46}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -94,9 +94,9 @@ func CreateSchedulerResponseComponent(scheduler *models.Scheduler) templ.Compone
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var5 string
-		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(scheduler.Token)
+		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(buffer.Token)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/create_scheduler_response.templ`, Line: 34, Col: 24}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/components/create_buffer_response.templ`, Line: 34, Col: 21}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {

@@ -50,10 +50,10 @@ func main() {
 	mux.Handle("GET /orders", middleware.Auth(http.HandlerFunc(h.Orders)))
 	mux.Handle("GET /profile", middleware.Auth(http.HandlerFunc(h.Profile)))
 
-	// schedulers
-	mux.Handle("GET /schedulers", middleware.Auth(http.HandlerFunc(h.Schedulers)))
-	mux.Handle("POST /schedulers", middleware.Auth(http.HandlerFunc(h.CreateScheduler)))
-	mux.Handle("DELETE /schedulers/{id}", middleware.Auth(http.HandlerFunc(h.DeleteScheduler)))
+	// buffers
+	mux.Handle("GET /buffers", middleware.Auth(http.HandlerFunc(h.Buffers)))
+	mux.Handle("POST /buffers", middleware.Auth(http.HandlerFunc(h.CreateBuffer)))
+	mux.Handle("DELETE /buffers/{id}", middleware.Auth(http.HandlerFunc(h.DeleteBuffer)))
 
 	// API routes
 	mux.Handle("POST /api/devices/data", middleware.DeviceAuth(http.HandlerFunc(h.CreateDeviceData)))
