@@ -34,17 +34,16 @@ type Order struct {
 }
 
 type Address struct {
-	ID          string
-	Name        string
-	Description string
-	Price       float64
+	ID     string
+	Name   string
+	Street string
 }
 
 type Card struct {
-	ID          string
-	Name        string
-	Description string
-	Price       float64
+	ID       string
+	Brand    string
+	ExpMonth int64
+	ExpYear  int64
 }
 
 type Profile struct {
@@ -55,8 +54,8 @@ type Profile struct {
 type Provider interface {
 	GetProfile(context.Context) (Profile, error)
 	ListProducts(context.Context) ([]Product, error)
-	// ListCards(context.Context) ([]Card, error)
-	// ListAddresses(context.Context) ([]Address, error)
+	ListCards(context.Context) ([]Card, error)
+	ListAddresses(context.Context) ([]Address, error)
 	ListOrders(context.Context) ([]Order, error)
 	CreateOrder(ctx context.Context, productID string, cardID string, addressID string) (orderID string, err error)
 }
@@ -108,8 +107,43 @@ func (t TerminalProvider) ListProducts(ctx context.Context) ([]Product, error) {
 
 }
 
-// func (t TerminalProvider) ListCards()     {}
-// func (t TerminalProvider) ListAddresses() {}
+func (t TerminalProvider) ListCards(ctx context.Context) ([]Card, error) {
+	response, err := t.client.Card.List(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var cards []Card
+	for _, c := range response.Data {
+
+		cards = append(cards, Card{
+			ID:       c.ID,
+			Brand:    c.Brand,
+			ExpMonth: c.Expiration.Month,
+			ExpYear:  c.Expiration.Year,
+		})
+	}
+
+	return cards, nil
+}
+func (t TerminalProvider) ListAddresses(ctx context.Context) ([]Address, error) {
+	response, err := t.client.Address.List(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var addresses []Address
+	for _, a := range response.Data {
+
+		addresses = append(addresses, Address{
+			ID:     a.ID,
+			Name:   a.Name,
+			Street: a.Street1,
+		})
+	}
+
+	return addresses, nil
+}
 func (t TerminalProvider) ListOrders(ctx context.Context) ([]Order, error) {
 	response, err := t.client.Order.List(ctx)
 	if err != nil {

@@ -77,6 +77,9 @@ func (h *Handlers) Products(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) Profile(w http.ResponseWriter, r *http.Request) {
+	// profile page contains mostly external data, including:
+	// addresses, credit cards, orders
+
 	provider, ok := ctx.GetProvider(r.Context())
 	if !ok {
 		log.Printf("terminal provider not found")
@@ -88,8 +91,27 @@ func (h *Handlers) Profile(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to fetch profile", http.StatusInternalServerError)
 		return
 	}
+	orders, err := provider.ListOrders(r.Context())
+	if err != nil {
+		log.Printf("failed to fetch orders: %s", err)
+		http.Error(w, "Failed to fetch orders", http.StatusInternalServerError)
+		return
+	}
+	cards, err := provider.ListCards(r.Context())
+	if err != nil {
+		log.Printf("failed to fetch cards: %s", err)
+		http.Error(w, "Failed to fetch cards", http.StatusInternalServerError)
+		return
+	}
 
-	templates.ProfileView(profile).Render(r.Context(), w)
+	addresses, err := provider.ListAddresses(r.Context())
+	if err != nil {
+		log.Printf("failed to fetch addresses: %s", err)
+		http.Error(w, "Failed to fetch addresses", http.StatusInternalServerError)
+		return
+	}
+
+	templates.ProfileView(profile, orders, cards, addresses).Render(r.Context(), w)
 }
 
 func (h *Handlers) Orders(w http.ResponseWriter, r *http.Request) {

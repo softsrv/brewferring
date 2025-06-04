@@ -1,9 +1,10 @@
 package templates
 
 import "github.com/softsrv/brewferring/internal/provider"
+import "strconv"
 
 
-templ ProfileView(profile provider.Profile) {
+templ ProfileView(profile provider.Profile, orders []provider.Order, cards []provider.Card, addresses []provider.Address) {
 	@Base() {
 		@Navbar()
 		<main class="container mx-auto px-4 py-8">
@@ -15,6 +16,30 @@ templ ProfileView(profile provider.Profile) {
 							<span class="label-text">Email</span>
 						</label>
 						<p class="text-lg">{ profile.Email }</p>
+					</div>
+					<div>
+					<h3>Orders</h3>
+					<ul>
+					for _, item := range orders {
+						<li>{ item.ID }, { item.TrackingURL } </li>
+					}
+					</ul>
+					</div>
+					<div>
+					<h3>Addresses</h3>
+					<ul>
+					for _, item := range addresses {
+						<li>{ item.Name }, { item.Street }</li>
+					}
+					</ul>
+					</div>
+					<div>
+					<h3>Cards</h3>
+					<ul>
+					for _, item := range cards {
+						<li>{ item.ID }, { item.Brand }, { strconv.FormatInt(item.ExpMonth, 10) }, { strconv.FormatInt(item.ExpYear, 10) }</li>
+					}
+					</ul>
 					</div>
 				</div>
 			</div>

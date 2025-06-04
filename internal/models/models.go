@@ -9,23 +9,24 @@ import (
 
 type User struct {
 	gorm.Model
-	TerminalID string   `gorm:"uniqueIndex;not null"`
-	Email      string   `gorm:"uniqueIndex;not null"`
-	Buffers    []Buffer `gorm:"foreignKey:UserID"`
+	TerminalID string `gorm:"uniqueIndex;not null"`
+	Email      string `gorm:"uniqueIndex;not null"`
+	Buffers    []Buffer
 }
 
 type DeviceData struct {
 	gorm.Model
-	BufferID uint    `gorm:"not null"`
-	Buffer   Buffer  `gorm:"foreignKey:BufferID"`
+	BufferID uint `gorm:"not null"`
+	Buffer   Buffer
 	Value    float64 `gorm:"not null"`
 }
 
 type Buffer struct {
 	gorm.Model
-	Name            string         `gorm:"not null"`
-	UserID          uint           `gorm:"not null"`
-	User            User           `gorm:"foreignKey:UserID"`
+	Name            string `gorm:"not null"`
+	UserID          uint   `gorm:"not null"`
+	User            User
+	Data            []DeviceData
 	ProductID       string         `gorm:"not null"` // From terminal.shop
 	CardID          string         `gorm:"not null"` // From terminal.shop
 	AddressID       string         `gorm:"not null"` // From terminal.shop
